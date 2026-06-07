@@ -1,46 +1,63 @@
-<!DOCTYPE html>
+﻿<!DOCTYPE html>
 <html lang="en">
 <head>
 <meta charset="UTF-8">
 <meta name="viewport" content="width=device-width, initial-scale=1.0, user-scalable=no">
-<title>Clock Toy Gym — Neural OS</title>
+<title>Clock Toy Gym â€” Neural OS</title>
 <link rel="preconnect" href="https://fonts.googleapis.com">
 <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
-<link href="https://fonts.googleapis.com/css2?family=Comic+Neue:wght@700&family=Nunito:wght@600;800&display=swap" rel="stylesheet">
+<link href="https://fonts.googleapis.com/css2?family=Fraunces:opsz,wght@9..144,600;9..144,800;9..144,900&family=Quicksand:wght@500;600;700&display=swap" rel="stylesheet">
 <style>
 :root{
-  --board:#fbc02d;
-  --board-edge:#b8860b;
-  --face:#fff8e7;
-  --hand-h:#e63946;
-  --hand-m:#1d4ed8;
-  --tick:#2b2b2b;
-  --ink:#1a1a1a;
-  --muted:#5a4d20;
-  --ok:#2e7d32;
-  --bad:#c62828;
-  --warn:#d29922;
-  --soft:#fff3cd;
-  --r:18px;
-  --sky-top:#87ceeb;
-  --sky-bot:#b8e0f5;
-  --sun:#ffd54f;
-  --moon:#fff8dc;
+  /* Paper / inks */
+  --face:#faf3df;
+  --soft:#fbf3dc;
+  --ink:#2a2018;
+  --muted:#7a6a55;
+
+  /* Board â€” terracotta on cream */
+  --board:#d4814c;
+  --board-edge:#7a3a1e;
+  --board-shadow:rgba(60,28,14,.28);
+
+  /* Hands */
+  --hand-h:#a83232;        /* oxblood */
+  --hand-m:#2d4a6b;        /* slate blue */
+  --tick:#2a2018;
+
+  /* Status */
+  --ok:#5d8a47;            /* sage */
+  --bad:#b34028;           /* rust */
+  --warn:#cc9a3c;          /* mustard */
+
+  /* Sky defaults (overridden dynamically) */
+  --sky-top:#b8c8d0;
+  --sky-bot:#e3d5b8;
+  --sun:#f0b85e;
+  --moon:#f5ebd0;
+
+  /* Geometry scale */
+  --r:22px;
+  --r-sm:14px;
+  --r-xs:10px;
+  --shadow-card:0 6px 20px rgba(60,28,14,.18), 0 2px 4px rgba(60,28,14,.12);
+  --shadow-deep:0 10px 30px rgba(60,28,14,.32), 0 4px 8px rgba(60,28,14,.16);
 }
 *{box-sizing:border-box;margin:0;padding:0;-webkit-tap-highlight-color:transparent}
 html,body{min-height:100%}
 body{
-  font-family:'Comic Neue','Nunito',system-ui,-apple-system,'Segoe UI',sans-serif;
-  font-weight:700;
+  font-family:'Quicksand',system-ui,-apple-system,'Segoe UI',sans-serif;
+  font-weight:600;
   background:linear-gradient(180deg,var(--sky-top),var(--sky-bot));
   color:var(--ink);
   overflow-x:hidden;
   transition:background .8s ease;
-  font-size:18px;
+  font-size:17px;
+  letter-spacing:.005em;
   min-height:100vh;
 }
 
-/* ── Sky layer ─────────────────────────────────────────────── */
+/* â”€â”€ Sky layer â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€ */
 .sky{position:fixed;inset:0;z-index:0;pointer-events:none;overflow:hidden}
 .stars-svg{position:absolute;width:100%;height:100%;display:block}
 .celestial-body{
@@ -56,120 +73,144 @@ body{
 #stars{transition:opacity .8s ease}
 @keyframes twinkle{0%{opacity:.3}100%{opacity:1}}
 
-/* ── Board ─────────────────────────────────────────────────── */
+/* â”€â”€ Board â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€ */
 .board{
   position:relative;z-index:1;
-  max-width:540px;margin:0 auto;
-  padding:14px 12px 28px;
-  padding-top:140px; /* leave sky room above the board for the sun arc */
-  display:flex;flex-direction:column;gap:12px;
+  max-width:580px;margin:0 auto;
+  padding:18px 16px 36px;
+  padding-top:150px;
+  display:flex;flex-direction:column;gap:16px;
   min-height:100vh;
 }
 
 .hdr{
-  display:flex;justify-content:space-between;align-items:center;gap:10px;
+  display:flex;justify-content:space-between;align-items:center;gap:12px;
   background:var(--board);
-  border:3px solid var(--board-edge);
-  border-radius:var(--r);
-  padding:10px 16px;
-  box-shadow:0 4px 12px rgba(0,0,0,.18);
-}
-.back-btn a{color:var(--ink);text-decoration:none;font-size:.85rem;opacity:.75}
-.back-btn a:hover{opacity:1}
-.gym-title{font-size:1.15rem;font-weight:800;color:var(--ink);text-align:center;flex:1}
-.mode-pill{
-  font-size:.75rem;
-  background:var(--soft);
   border:2px solid var(--board-edge);
-  padding:5px 11px;border-radius:999px;color:var(--ink);
+  border-radius:var(--r);
+  padding:14px 20px;
+  box-shadow:var(--shadow-card);
+}
+.back-btn a{
+  color:var(--ink);text-decoration:none;
+  font-family:'Fraunces',serif;font-weight:600;font-style:italic;
+  font-size:.92rem;opacity:.7;
+  transition:opacity .2s;
+}
+.back-btn a:hover{opacity:1}
+.gym-title{
+  font-family:'Fraunces',serif;font-weight:900;
+  font-size:1.45rem;color:var(--ink);
+  text-align:center;flex:1;
+  letter-spacing:-.015em;
+  line-height:1;
+}
+.mode-pill{
+  font-size:.72rem;font-weight:700;
+  background:var(--face);
+  border:1.5px solid var(--board-edge);
+  padding:6px 12px;border-radius:999px;color:var(--ink);
   white-space:nowrap;
+  letter-spacing:.04em;
+  text-transform:uppercase;
 }
 
-/* ── Selection screens ────────────────────────────────────── */
+/* â”€â”€ Selection screens â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€ */
 .sel-block{
   background:var(--board);
-  border:3px solid var(--board-edge);
+  border:2px solid var(--board-edge);
   border-radius:var(--r);
-  padding:20px 14px;
-  box-shadow:0 4px 12px rgba(0,0,0,.18);
+  padding:26px 18px 22px;
+  box-shadow:var(--shadow-card);
 }
 .sel-title{
-  text-align:center;font-size:.85rem;letter-spacing:.08em;
-  color:var(--muted);margin-bottom:16px;text-transform:uppercase;
+  text-align:center;
+  font-family:'Fraunces',serif;font-weight:600;font-style:italic;
+  font-size:1.05rem;letter-spacing:.02em;
+  color:var(--face);margin-bottom:20px;
+  text-transform:none;
 }
-.sel-grid{display:grid;grid-template-columns:repeat(2,1fr);gap:10px}
+.sel-grid{display:grid;grid-template-columns:repeat(2,1fr);gap:12px}
 .sel-card{
-  background:var(--soft);
-  border:3px solid var(--board-edge);
-  border-radius:14px;
-  padding:14px 10px;
+  background:var(--face);
+  border:1.5px solid var(--board-edge);
+  border-radius:var(--r-sm);
+  padding:18px 12px;
   cursor:pointer;text-align:center;
-  display:flex;flex-direction:column;gap:6px;align-items:center;
-  transition:transform .1s,background .15s;
-  min-height:118px;
+  display:flex;flex-direction:column;gap:8px;align-items:center;
+  transition:transform .15s ease,box-shadow .15s ease,background .15s;
+  min-height:132px;
+  box-shadow:0 2px 0 var(--board-edge);
 }
-.sel-card:hover{background:#fff8e0;transform:translateY(-2px)}
-.sel-card:active{transform:translateY(0)}
-.sel-badge{font-size:1.8rem;line-height:1}
-.sel-name{font-size:1rem;font-weight:800;color:var(--ink)}
-.sel-desc{font-size:.7rem;color:var(--muted);line-height:1.35}
+.sel-card:hover{background:var(--soft);transform:translateY(-3px);box-shadow:0 5px 0 var(--board-edge)}
+.sel-card:active{transform:translateY(0);box-shadow:0 1px 0 var(--board-edge)}
+.sel-badge{font-size:2.1rem;line-height:1;filter:saturate(.85)}
+.sel-name{
+  font-family:'Fraunces',serif;font-weight:800;
+  font-size:1.08rem;color:var(--ink);
+  letter-spacing:-.01em;line-height:1.1;
+}
+.sel-desc{font-size:.72rem;color:var(--muted);line-height:1.4;font-weight:500}
+.sel-desc b{color:var(--ink);font-weight:700}
 
-/* ── Stats row ────────────────────────────────────────────── */
+/* â”€â”€ Stats row â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€ */
 #stats-row{
-  display:flex;gap:14px;
+  display:flex;gap:18px;
   background:var(--board);
-  border:3px solid var(--board-edge);
+  border:2px solid var(--board-edge);
   border-radius:var(--r);
-  padding:12px 14px;
-  box-shadow:0 4px 12px rgba(0,0,0,.18);
+  padding:16px 18px;
+  box-shadow:var(--shadow-card);
 }
-.ring-wrap{position:relative;width:70px;height:70px;flex-shrink:0}
-.ring-wrap svg{width:70px;height:70px;transform:rotate(-90deg)}
-.r-bg{fill:none;stroke:rgba(0,0,0,.15);stroke-width:7}
-.r-fill{fill:none;stroke:var(--ok);stroke-width:7;stroke-linecap:round;stroke-dasharray:170;stroke-dashoffset:170;transition:stroke-dashoffset .4s ease,stroke .3s}
+.ring-wrap{position:relative;width:78px;height:78px;flex-shrink:0}
+.ring-wrap svg{width:78px;height:78px;transform:rotate(-90deg)}
+.r-bg{fill:none;stroke:rgba(42,32,24,.18);stroke-width:8}
+.r-fill{fill:none;stroke:var(--ok);stroke-width:8;stroke-linecap:round;stroke-dasharray:170;stroke-dashoffset:170;transition:stroke-dashoffset .4s ease,stroke .3s}
 .ring-label{position:absolute;inset:0;display:flex;flex-direction:column;align-items:center;justify-content:center}
-.r-pct{font-size:1.05rem;font-weight:800;line-height:1}
-.r-sub{font-size:.55rem;color:var(--muted);margin-top:2px}
-.stats-right{flex:1;display:flex;flex-direction:column;justify-content:space-between;gap:6px}
-.stat-block{display:flex;flex-direction:column;gap:3px}
-.stat-lbl{font-size:.68rem;color:var(--muted);display:flex;justify-content:space-between}
-.stat-lbl span{font-weight:800;color:var(--ink)}
-.bar-wrap{height:7px;background:rgba(0,0,0,.15);border-radius:4px;position:relative}
-.bar-fill{height:100%;border-radius:4px;background:var(--hand-m);transition:width .4s ease,background .3s}
-.streak-row{display:flex;align-items:center;gap:8px}
-.streak-label{font-size:.68rem;color:var(--muted)}
-.sdots{display:flex;gap:5px}
-.sdot{width:10px;height:10px;border-radius:50%;background:rgba(0,0,0,.15);transition:background .2s,transform .2s}
-.sdot.lit{background:var(--hand-h);transform:scale(1.15)}
+.r-pct{font-family:'Fraunces',serif;font-size:1.3rem;font-weight:800;line-height:1;letter-spacing:-.02em;color:var(--face)}
+.r-sub{font-size:.55rem;color:var(--face);opacity:.65;margin-top:3px;text-transform:uppercase;letter-spacing:.08em;font-weight:700}
+.stats-right{flex:1;display:flex;flex-direction:column;justify-content:space-between;gap:8px}
+.stat-block{display:flex;flex-direction:column;gap:5px}
+.stat-lbl{font-size:.7rem;color:var(--face);opacity:.8;display:flex;justify-content:space-between;font-weight:600;text-transform:uppercase;letter-spacing:.06em}
+.stat-lbl span{font-weight:800;color:var(--face);opacity:1;font-family:'Fraunces',serif;font-size:.85rem;letter-spacing:0;text-transform:none}
+.bar-wrap{height:8px;background:rgba(42,32,24,.22);border-radius:4px;position:relative}
+.bar-fill{height:100%;border-radius:4px;background:var(--face);transition:width .4s ease,background .3s}
+.streak-row{display:flex;align-items:center;gap:10px}
+.streak-label{font-size:.7rem;color:var(--face);opacity:.8;text-transform:uppercase;letter-spacing:.06em;font-weight:600}
+.sdots{display:flex;gap:6px}
+.sdot{width:11px;height:11px;border-radius:50%;background:rgba(42,32,24,.25);transition:background .25s,transform .25s}
+.sdot.lit{background:var(--face);transform:scale(1.2);box-shadow:0 0 0 2px rgba(250,243,223,.3)}
 
-/* ── Progress + timer ─────────────────────────────────────── */
-#prog-track{display:flex;gap:3px;padding:0 4px}
-.pd{flex:1;height:6px;border-radius:3px;background:rgba(0,0,0,.2);transition:background .15s}
+/* â”€â”€ Progress + timer â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€ */
+#prog-track{display:flex;gap:4px;padding:0 6px}
+.pd{flex:1;height:5px;border-radius:3px;background:rgba(42,32,24,.18);transition:background .2s}
 .pd.done-ok{background:var(--ok)}
 .pd.done-bad{background:var(--bad)}
-.pd.cur{background:var(--hand-m)}
-#timer-wrap{height:8px;background:rgba(0,0,0,.2);border-radius:4px;overflow:hidden;margin:0 4px}
+.pd.cur{background:var(--hand-h)}
+#timer-wrap{height:10px;background:rgba(42,32,24,.18);border-radius:5px;overflow:hidden;margin:0 6px;border:1px solid rgba(42,32,24,.12)}
 #timer-bar{height:100%;background:var(--ok);width:100%;transition:width .1s linear,background-color .3s}
 
-/* ── Dice area ────────────────────────────────────────────── */
+/* â”€â”€ Dice area â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€ */
 .dice-area{
-  display:flex;align-items:center;gap:12px;
+  display:flex;align-items:center;gap:14px;
   background:var(--board);
-  border:3px solid var(--board-edge);
+  border:2px solid var(--board-edge);
   border-radius:var(--r);
-  padding:12px;
-  box-shadow:0 4px 12px rgba(0,0,0,.18);
+  padding:16px;
+  box-shadow:var(--shadow-card);
 }
 .dice{
-  width:78px;height:78px;flex-shrink:0;
-  background:linear-gradient(135deg,#ffffff,#f0f0f0);
-  border:2px solid #d0d0d0;
-  border-radius:14px;
+  width:88px;height:88px;flex-shrink:0;
+  background:var(--face);
+  border:1.5px solid var(--board-edge);
+  border-radius:var(--r-sm);
   display:flex;flex-direction:column;align-items:center;justify-content:center;
-  font-size:1.1rem;font-weight:800;color:var(--ink);
-  box-shadow:inset 0 -3px 0 rgba(0,0,0,.12),0 3px 6px rgba(0,0,0,.2);
+  font-family:'Fraunces',serif;font-weight:900;
+  font-size:1.15rem;color:var(--ink);
+  box-shadow:inset 0 -4px 0 rgba(122,58,30,.12), 0 3px 0 var(--board-edge);
   transition:transform .6s cubic-bezier(.4,1.8,.4,1);
-  gap:2px;
+  gap:3px;
+  letter-spacing:-.02em;
 }
 .dice.rolling{animation:diceRoll .9s ease-in-out}
 @keyframes diceRoll{
@@ -179,203 +220,276 @@ body{
   75%{transform:rotate(540deg) scale(1.06)}
   100%{transform:rotate(720deg) scale(1)}
 }
-.dice-time{font-size:1.05rem}
-.dice-period{font-size:.7rem;opacity:.7;font-weight:600}
+.dice-time{font-size:1.25rem;line-height:1}
+.dice-period{font-size:.7rem;opacity:.65;font-weight:600;font-family:'Quicksand',sans-serif;text-transform:uppercase;letter-spacing:.08em;margin-top:2px}
 #roll-btn{
   flex:1;
-  background:var(--hand-m);color:#fff;
-  border:none;border-radius:12px;
-  padding:14px 16px;font-size:1rem;font-weight:800;
-  cursor:pointer;font-family:inherit;
-  min-height:56px;
-  box-shadow:0 3px 0 #14387c,0 4px 8px rgba(0,0,0,.2);
+  background:var(--hand-m);color:var(--face);
+  border:none;border-radius:var(--r-sm);
+  padding:16px 18px;font-size:1rem;font-weight:700;
+  cursor:pointer;font-family:'Quicksand',sans-serif;
+  min-height:62px;
+  letter-spacing:.02em;
+  box-shadow:0 4px 0 #1a3450, 0 5px 12px rgba(45,74,107,.25);
+  transition:transform .08s ease,box-shadow .08s ease;
 }
-#roll-btn:active{transform:translateY(2px);box-shadow:0 1px 0 #14387c,0 2px 4px rgba(0,0,0,.2)}
+#roll-btn:active{transform:translateY(3px);box-shadow:0 1px 0 #1a3450, 0 2px 4px rgba(45,74,107,.2)}
 .target-display{
-  font-size:.95rem;color:var(--ink);
-  padding:8px 12px;background:var(--soft);
-  border-radius:10px;font-weight:800;
-  min-width:84px;text-align:center;
-  border:2px solid var(--board-edge);
+  font-family:'Fraunces',serif;font-weight:800;
+  font-size:1rem;color:var(--ink);
+  padding:10px 14px;background:var(--face);
+  border-radius:var(--r-sm);
+  min-width:92px;text-align:center;
+  border:1.5px solid var(--board-edge);
+  letter-spacing:-.01em;
+  box-shadow:0 2px 0 var(--board-edge);
 }
 
-/* ── Clock ────────────────────────────────────────────────── */
+/* â”€â”€ Clock â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€ */
 .clock-wrap{
   background:var(--board);
-  border:4px solid var(--board-edge);
+  border:3px solid var(--board-edge);
   border-radius:50%;
-  padding:6px;
+  padding:8px;
   align-self:center;
-  box-shadow:0 6px 20px rgba(0,0,0,.28);
+  box-shadow:var(--shadow-deep), inset 0 0 0 6px rgba(122,58,30,.08);
   position:relative;
-  width:min(360px,86vw);
+  width:min(380px,88vw);
   aspect-ratio:1;
 }
 #clock{width:100%;height:100%;display:block;touch-action:none;user-select:none}
-.face{fill:var(--face);stroke:var(--board-edge);stroke-width:2}
-.tick{fill:var(--tick)}
-.tick.big{fill:var(--ink)}
-.tick-num{font-family:inherit;font-size:14px;font-weight:800;fill:var(--ink);text-anchor:middle;dominant-baseline:central;pointer-events:none}
-.hour-disc{stroke:rgba(0,0,0,.3);stroke-width:1.5}
-.hour-num{font-family:inherit;font-size:22px;font-weight:800;fill:var(--ink);text-anchor:middle;dominant-baseline:central;pointer-events:none}
-#hand-h{stroke:var(--hand-h);stroke-width:13;stroke-linecap:round;cursor:grab;transition:transform .15s ease}
-#hand-m{stroke:var(--hand-m);stroke-width:7;stroke-linecap:round;cursor:grab;transition:transform .15s ease}
-.pivot{fill:var(--ink)}
-[data-locked="true"]{opacity:.55;cursor:default!important;pointer-events:none}
+.face{fill:var(--face);stroke:var(--board-edge);stroke-width:2.5}
+.tick{fill:var(--tick);opacity:.55}
+.tick.big{fill:var(--ink);opacity:1}
+.tick-num{font-family:'Quicksand',sans-serif;font-size:13px;font-weight:700;fill:var(--muted);text-anchor:middle;dominant-baseline:central;pointer-events:none;letter-spacing:.02em}
+.hour-disc{stroke:rgba(42,32,24,.22);stroke-width:1.5}
+.hour-num{font-family:'Fraunces',serif;font-size:22px;font-weight:900;fill:var(--face);text-anchor:middle;dominant-baseline:central;pointer-events:none;letter-spacing:-.02em}
+#hand-h{stroke:var(--hand-h);stroke-width:14;stroke-linecap:round;cursor:grab;transition:transform .15s ease;filter:drop-shadow(0 1.5px 0 rgba(122,58,30,.25))}
+#hand-m{stroke:var(--hand-m);stroke-width:6;stroke-linecap:round;cursor:grab;transition:transform .15s ease;filter:drop-shadow(0 1px 0 rgba(122,58,30,.2))}
+.pivot{fill:var(--ink);stroke:var(--face);stroke-width:1.5}
+[data-locked="true"]{opacity:.5;cursor:default!important;pointer-events:none}
 [data-dragging="true"]{transition:none!important;cursor:grabbing!important}
 
-/* ── Sliders ──────────────────────────────────────────────── */
+/* â”€â”€ Sliders â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€ */
 .sliders{
   background:var(--board);
-  border:3px solid var(--board-edge);
+  border:2px solid var(--board-edge);
   border-radius:var(--r);
-  padding:14px 12px;
-  display:flex;flex-direction:column;gap:12px;
-  box-shadow:0 4px 12px rgba(0,0,0,.18);
+  padding:22px 16px 18px;
+  display:flex;flex-direction:column;gap:18px;
+  box-shadow:var(--shadow-card);
 }
 .rail{
-  position:relative;height:46px;
-  border-radius:23px;
-  background:#fff8e7;
-  border:2px solid var(--board-edge);
+  position:relative;height:52px;
+  border-radius:26px;
+  background:var(--face);
+  border:1.5px solid var(--board-edge);
+  box-shadow:inset 0 2px 4px rgba(122,58,30,.1);
   touch-action:none;
   user-select:none;
 }
 .rail-ticks{
   position:absolute;inset:0;
   display:flex;align-items:center;justify-content:space-between;
-  padding:0 22px;pointer-events:none;
+  padding:0 26px;pointer-events:none;
 }
 .rail-tick{
-  font-size:.7rem;font-weight:800;color:var(--ink);
-  width:26px;text-align:center;
+  font-family:'Fraunces',serif;
+  font-size:.78rem;font-weight:700;color:var(--muted);
+  width:28px;text-align:center;
   white-space:nowrap;
+  letter-spacing:-.01em;
 }
 .knob{
   position:absolute;
-  width:38px;height:38px;
+  width:44px;height:44px;
   border-radius:50%;
-  border:2px solid rgba(0,0,0,.35);
+  border:2px solid var(--face);
   top:50%;
   transform:translate(-50%,-50%);
   display:flex;align-items:center;justify-content:center;
-  color:#fff;font-weight:800;font-size:.9rem;
+  color:var(--face);
+  font-family:'Fraunces',serif;font-weight:800;font-size:1rem;
   cursor:grab;
-  box-shadow:0 3px 6px rgba(0,0,0,.3);
+  box-shadow:0 3px 8px rgba(42,32,24,.32), 0 0 0 1.5px rgba(42,32,24,.18);
   transition:left .2s ease;
   z-index:2;
   pointer-events:none;
+  letter-spacing:-.02em;
 }
 .hour-knob{background:var(--hand-h)}
 .minute-knob{background:var(--hand-m)}
-.rail[data-dragging="true"] .knob{transition:none;cursor:grabbing;transform:translate(-50%,-50%) scale(1.12)}
-.rail[data-locked="true"]{opacity:.55}
-.rail[data-locked="true"] .knob{box-shadow:0 2px 4px rgba(0,0,0,.2)}
+.rail[data-dragging="true"] .knob{transition:none;cursor:grabbing;transform:translate(-50%,-50%) scale(1.14)}
+.rail[data-locked="true"]{opacity:.5}
+.rail[data-locked="true"] .knob{box-shadow:0 2px 4px rgba(42,32,24,.2)}
 .rail-label{
-  position:absolute;left:8px;top:-9px;
-  font-size:.6rem;color:var(--muted);background:var(--board);
-  padding:0 6px;font-weight:800;letter-spacing:.04em;
+  position:absolute;left:14px;top:-10px;
+  font-family:'Quicksand',sans-serif;
+  font-size:.62rem;color:var(--face);background:var(--board);
+  padding:2px 8px;font-weight:700;letter-spacing:.12em;
+  text-transform:uppercase;
+  border-radius:3px;
 }
 
-/* ── Buttons + feedback ───────────────────────────────────── */
-.action-row{display:flex;gap:10px}
+/* â”€â”€ Buttons + feedback â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€ */
+.action-row{display:flex;gap:12px}
 #check-btn{
-  flex:1;background:var(--ok);color:#fff;
-  border:none;border-radius:14px;
-  padding:14px;font-size:1.05rem;font-weight:800;
-  cursor:pointer;font-family:inherit;
-  min-height:58px;
-  box-shadow:0 4px 0 #1f5523,0 5px 10px rgba(0,0,0,.2);
+  flex:1;background:var(--ok);color:var(--face);
+  border:none;border-radius:var(--r-sm);
+  padding:16px;font-size:1.08rem;font-weight:700;
+  cursor:pointer;font-family:'Quicksand',sans-serif;
+  min-height:62px;
+  letter-spacing:.02em;
+  box-shadow:0 4px 0 #3e6230, 0 6px 14px rgba(93,138,71,.25);
+  transition:transform .08s ease,box-shadow .08s ease;
 }
-#check-btn:active{transform:translateY(3px);box-shadow:0 1px 0 #1f5523,0 2px 4px rgba(0,0,0,.2)}
+#check-btn:active{transform:translateY(3px);box-shadow:0 1px 0 #3e6230, 0 2px 4px rgba(93,138,71,.2)}
 #hint-btn{
-  background:var(--soft);color:var(--ink);
-  border:2px solid var(--board-edge);border-radius:14px;
-  padding:14px 16px;font-size:.95rem;font-weight:800;
-  cursor:pointer;font-family:inherit;
-  min-height:58px;
+  background:var(--face);color:var(--ink);
+  border:1.5px solid var(--board-edge);border-radius:var(--r-sm);
+  padding:16px 20px;font-size:.95rem;font-weight:700;
+  cursor:pointer;font-family:'Quicksand',sans-serif;
+  min-height:62px;
+  box-shadow:0 3px 0 var(--board-edge);
+  transition:transform .08s ease,box-shadow .08s ease;
 }
+#hint-btn:active{transform:translateY(2px);box-shadow:0 1px 0 var(--board-edge)}
 #fb{
-  border-radius:14px;padding:13px 15px;
-  font-size:.92rem;line-height:1.5;display:none;
+  border-radius:var(--r-sm);padding:16px 18px;
+  font-size:.94rem;line-height:1.55;display:none;
+  font-weight:500;
+  background:var(--face);
+  border:1.5px solid var(--board-edge);
+  box-shadow:var(--shadow-card);
 }
-#fb.ok{background:#d4edda;border:2px solid var(--ok)}
-#fb.bad{background:#f8d7da;border:2px solid var(--bad)}
-#fb.hint{background:var(--soft);border:2px solid var(--warn)}
-.fv{font-weight:800;margin-bottom:4px;font-size:1rem}
-#fb.ok .fv{color:var(--ok)}
-#fb.bad .fv{color:var(--bad)}
-#fb.hint .fv{color:#8a6d1c}
+#fb.ok{background:#e8f0db;border-color:#3e6230}
+#fb.bad{background:#fbe2da;border-color:#7a2818}
+#fb.hint{background:#fbeeca;border-color:#a07820}
+.fv{
+  font-family:'Fraunces',serif;font-weight:800;
+  margin-bottom:6px;font-size:1.08rem;
+  letter-spacing:-.01em;line-height:1.2;
+}
+#fb.ok .fv{color:#3e6230}
+#fb.bad .fv{color:#7a2818}
+#fb.hint .fv{color:#7a5a18}
+#fb b{font-weight:700;font-family:'Fraunces',serif}
 #next-btn{
-  background:var(--hand-m);color:#fff;
-  border:none;border-radius:14px;
-  padding:14px;font-size:1.05rem;font-weight:800;
-  cursor:pointer;font-family:inherit;
-  min-height:58px;display:none;
-  box-shadow:0 4px 0 #14387c,0 5px 10px rgba(0,0,0,.2);
+  background:var(--hand-m);color:var(--face);
+  border:none;border-radius:var(--r-sm);
+  padding:16px;font-size:1.08rem;font-weight:700;
+  cursor:pointer;font-family:'Quicksand',sans-serif;
+  min-height:62px;display:none;
+  letter-spacing:.02em;
+  box-shadow:0 4px 0 #1a3450, 0 6px 14px rgba(45,74,107,.25);
+  transition:transform .08s ease,box-shadow .08s ease;
 }
-#next-btn:active{transform:translateY(3px);box-shadow:0 1px 0 #14387c,0 2px 4px rgba(0,0,0,.2)}
+#next-btn:active{transform:translateY(3px);box-shadow:0 1px 0 #1a3450, 0 2px 4px rgba(45,74,107,.2)}
 
-/* ── Summary ──────────────────────────────────────────────── */
+/* â”€â”€ Summary â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€ */
 #summary{
   background:var(--board);
-  border:3px solid var(--board-edge);
-  border-radius:var(--r);
-  padding:20px;
-  box-shadow:0 4px 12px rgba(0,0,0,.18);
-}
-#summary h2{font-size:1.2rem;margin-bottom:16px;color:var(--ink);text-align:center}
-.sum-hero{display:flex;gap:18px;align-items:center;margin-bottom:18px}
-.sum-ring{position:relative;width:96px;height:96px;flex-shrink:0}
-.sum-ring svg{width:96px;height:96px;transform:rotate(-90deg)}
-.sr-bg{fill:none;stroke:rgba(0,0,0,.15);stroke-width:8}
-.sr-fill{fill:none;stroke-width:8;stroke-linecap:round;stroke-dasharray:220;stroke-dashoffset:220;transition:stroke-dashoffset .9s ease,stroke .3s}
-.sum-ring-label{position:absolute;inset:0;display:flex;flex-direction:column;align-items:center;justify-content:center}
-.srl-pct{font-size:1.4rem;font-weight:800;color:var(--ink)}
-.srl-sub{font-size:.6rem;color:var(--muted);margin-top:2px}
-.sum-stats{flex:1;display:flex;flex-direction:column;gap:7px}
-.ss-row{display:flex;justify-content:space-between;font-size:.92rem}
-.ss-k{color:var(--muted)}
-.ss-v{font-weight:800;color:var(--ink)}
-.error-chart{display:flex;flex-direction:column;gap:6px;margin-bottom:14px}
-.error-row{display:flex;align-items:center;gap:8px;font-size:.85rem;padding:6px 10px;background:var(--soft);border-radius:8px}
-.error-key{flex:1;color:var(--muted)}
-.error-cnt{font-weight:800;color:var(--ink)}
-.vbanner{border-radius:14px;padding:14px;font-size:.95rem;margin-bottom:14px;background:var(--soft);border:2px solid var(--board-edge);line-height:1.45}
-.restart-btn{
-  width:100%;background:var(--soft);
   border:2px solid var(--board-edge);
-  border-radius:14px;padding:13px;
-  color:var(--ink);font-size:.95rem;font-weight:800;
-  cursor:pointer;font-family:inherit;
-  margin-top:8px;min-height:52px;
+  border-radius:var(--r);
+  padding:26px 22px 20px;
+  box-shadow:var(--shadow-card);
 }
-.restart-btn:hover{background:#fff8e0}
+#summary h2{
+  font-family:'Fraunces',serif;font-weight:900;
+  font-size:1.55rem;margin-bottom:22px;
+  color:var(--face);text-align:center;
+  letter-spacing:-.02em;line-height:1.1;
+}
+.sum-hero{display:flex;gap:22px;align-items:center;margin-bottom:22px}
+.sum-ring{position:relative;width:108px;height:108px;flex-shrink:0}
+.sum-ring svg{width:108px;height:108px;transform:rotate(-90deg)}
+.sr-bg{fill:none;stroke:rgba(42,32,24,.22);stroke-width:9}
+.sr-fill{fill:none;stroke-width:9;stroke-linecap:round;stroke-dasharray:220;stroke-dashoffset:220;transition:stroke-dashoffset .9s ease,stroke .3s}
+.sum-ring-label{position:absolute;inset:0;display:flex;flex-direction:column;align-items:center;justify-content:center}
+.srl-pct{font-family:'Fraunces',serif;font-size:1.65rem;font-weight:900;color:var(--face);letter-spacing:-.03em;line-height:1}
+.srl-sub{font-size:.6rem;color:var(--face);opacity:.7;margin-top:4px;text-transform:uppercase;letter-spacing:.1em;font-weight:700}
+.sum-stats{flex:1;display:flex;flex-direction:column;gap:9px}
+.ss-row{display:flex;justify-content:space-between;align-items:baseline;font-size:.92rem;color:var(--face)}
+.ss-k{color:var(--face);opacity:.75;font-weight:500}
+.ss-v{font-family:'Fraunces',serif;font-weight:800;color:var(--face);font-size:1rem;letter-spacing:-.01em}
+.error-chart{display:flex;flex-direction:column;gap:7px;margin-bottom:18px}
+.error-row{display:flex;align-items:center;gap:10px;font-size:.88rem;padding:10px 14px;background:var(--face);border-radius:var(--r-xs);border:1px solid rgba(122,58,30,.2)}
+.error-key{flex:1;color:var(--muted);font-weight:500}
+.error-cnt{font-family:'Fraunces',serif;font-weight:800;color:var(--ink);font-size:1.05rem}
+.vbanner{border-radius:var(--r-sm);padding:18px;font-size:.96rem;margin-bottom:16px;background:var(--face);border:1.5px solid var(--board-edge);line-height:1.5;color:var(--ink);box-shadow:0 2px 0 var(--board-edge)}
+.vbanner strong{font-family:'Fraunces',serif;font-weight:900;font-size:1.08rem;letter-spacing:-.01em}
+.vbanner b{font-family:'Fraunces',serif;font-weight:700}
+.restart-btn{
+  width:100%;background:var(--face);
+  border:1.5px solid var(--board-edge);
+  border-radius:var(--r-sm);padding:15px;
+  color:var(--ink);font-size:.96rem;font-weight:700;
+  cursor:pointer;font-family:'Quicksand',sans-serif;
+  margin-top:10px;min-height:56px;
+  box-shadow:0 3px 0 var(--board-edge);
+  transition:transform .08s ease,box-shadow .08s ease;
+  letter-spacing:.01em;
+}
+.restart-btn:hover{background:var(--soft)}
+.restart-btn:active{transform:translateY(2px);box-shadow:0 1px 0 var(--board-edge)}
 
-/* ── Mobile ───────────────────────────────────────────────── */
+/* â”€â”€ Desktop two-column layout â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€ */
+@media(min-width:960px){
+  .board{max-width:980px;padding-top:160px}
+  /* :not([hidden]) keeps display:grid from overriding the `hidden` attribute. */
+  #play:not([hidden]){
+    display:grid;
+    grid-template-columns:minmax(0,560px) minmax(280px,320px);
+    column-gap:32px;
+    row-gap:16px;
+    align-items:start;
+  }
+  #prog-track,#timer-wrap,#stats-row,.dice-area,.clock-wrap,.sliders{grid-column:1}
+  .action-row,#fb,#next-btn{grid-column:2;width:100%;align-self:start}
+  .action-row{
+    grid-row:1;
+    position:sticky;top:24px;
+    flex-direction:column;
+    z-index:5;
+  }
+  #fb{grid-row:2;position:sticky;top:130px;max-height:calc(100vh - 160px);overflow:auto;z-index:4}
+  #next-btn{grid-row:3;position:sticky;top:130px;z-index:4}
+  .action-row #check-btn,.action-row #hint-btn{width:100%}
+  /* Header and selection screens stay centered above the play grid. */
+  .hdr,#mode-sel,#diff-sel,#summary{max-width:600px;margin-left:auto;margin-right:auto;width:100%}
+}
+
+/* â”€â”€ Mobile â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€ */
 @media(max-width:480px){
-  body{font-size:16px}
-  .board{padding:10px 8px 24px;gap:10px}
-  .gym-title{font-size:1rem}
-  .sel-card{min-height:104px;padding:12px 8px}
-  .sel-name{font-size:.92rem}
-  .sel-desc{font-size:.66rem}
-  .sel-badge{font-size:1.5rem}
-  .dice-area{padding:10px;gap:9px}
-  .dice{width:62px;height:62px}
-  .dice-time{font-size:.9rem}
+  body{font-size:15px}
+  .board{padding:14px 10px 28px;padding-top:130px;gap:12px}
+  .gym-title{font-size:1.2rem}
+  .hdr{padding:11px 14px}
+  .sel-block{padding:20px 14px}
+  .sel-card{min-height:118px;padding:14px 10px}
+  .sel-name{font-size:.98rem}
+  .sel-desc{font-size:.68rem}
+  .sel-badge{font-size:1.75rem}
+  .dice-area{padding:12px;gap:10px}
+  .dice{width:72px;height:72px}
+  .dice-time{font-size:1rem}
   .dice-period{font-size:.6rem}
-  .target-display{font-size:.85rem;padding:6px 10px;min-width:64px}
-  #roll-btn{padding:12px;font-size:.92rem}
-  .rail-tick{font-size:.6rem;width:18px}
-  .knob{width:34px;height:34px;font-size:.82rem}
-  .rail-ticks{padding:0 18px}
+  .target-display{font-size:.85rem;padding:8px 11px;min-width:72px}
+  #roll-btn{padding:13px;font-size:.94rem;min-height:54px}
+  .rail{height:48px}
+  .rail-tick{font-size:.68rem;width:20px}
+  .knob{width:40px;height:40px;font-size:.92rem}
+  .rail-ticks{padding:0 22px}
+  #check-btn,#next-btn{padding:14px;font-size:1rem;min-height:56px}
+  #hint-btn{padding:14px 16px;font-size:.92rem;min-height:56px}
+  .ring-wrap,.ring-wrap svg{width:68px;height:68px}
+  .r-pct{font-size:1.15rem}
 }
 </style>
 </head>
 <body>
 
-<!-- ── Sky background ─────────────────────────────────────── -->
+<!-- â”€â”€ Sky background â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€ -->
 <div class="sky" aria-hidden="true">
   <svg class="stars-svg" viewBox="0 0 1000 600" preserveAspectRatio="xMidYMid slice">
     <g id="stars"></g>
@@ -410,12 +524,12 @@ body{
   </div>
 </div>
 
-<!-- ── Board (foreground) ─────────────────────────────────── -->
+<!-- â”€â”€ Board (foreground) â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€ -->
 <div class="board">
 
   <div class="hdr">
-    <div class="back-btn"><a href="index.html">← Gyms</a></div>
-    <div class="gym-title">⏰ Clock Toy</div>
+    <div class="back-btn"><a href="index.html">â† Gyms</a></div>
+    <div class="gym-title">â° Clock Toy</div>
     <div class="mode-pill" id="mode-pill">Choose Mode</div>
   </div>
 
@@ -427,7 +541,7 @@ body{
   <div id="diff-sel" class="sel-block" hidden>
     <div class="sel-title">Pick a difficulty</div>
     <div class="sel-grid" id="diff-grid"></div>
-    <button class="restart-btn" onclick="restartFromMode()" style="margin-top:14px">↩ Back to modes</button>
+    <button class="restart-btn" style="margin-top:14px">â†© Back to modes</button>
   </div>
 
   <div id="play" hidden>
@@ -437,11 +551,11 @@ body{
     <div id="stats-row">
       <div class="ring-wrap">
         <svg viewBox="0 0 70 70"><circle class="r-bg" cx="35" cy="35" r="27"/><circle class="r-fill" id="r-fill" cx="35" cy="35" r="27"/></svg>
-        <div class="ring-label"><div class="r-pct" id="r-pct">—</div><div class="r-sub">correct</div></div>
+        <div class="ring-label"><div class="r-pct" id="r-pct">â€”</div><div class="r-sub">correct</div></div>
       </div>
       <div class="stats-right">
         <div class="stat-block">
-          <div class="stat-lbl">time per round <span id="lat-txt">—</span></div>
+          <div class="stat-lbl">time per round <span id="lat-txt">â€”</span></div>
           <div class="bar-wrap"><div class="bar-fill" id="lat-bar" style="width:0%"></div></div>
         </div>
         <div class="streak-row">
@@ -453,8 +567,8 @@ body{
 
     <div class="dice-area">
       <div class="dice" id="dice"><div class="dice-time">?</div><div class="dice-period">roll!</div></div>
-      <button id="roll-btn" onclick="rollDice()">🎲 Roll!</button>
-      <div class="target-display" id="target-display">—</div>
+      <button id="roll-btn">ðŸŽ² Roll!</button>
+      <div class="target-display" id="target-display">â€”</div>
     </div>
 
     <div class="clock-wrap">
@@ -475,831 +589,17 @@ body{
     </div>
 
     <div class="action-row">
-      <button id="hint-btn" onclick="showHint()" style="display:none">💡 Hint</button>
-      <button id="check-btn" onclick="checkAnswer()">✓ Check!</button>
+      <button id="hint-btn" style="display:none">ðŸ’¡ Hint</button>
+      <button id="check-btn">âœ“ Check!</button>
     </div>
     <div id="fb"></div>
-    <button id="next-btn" onclick="nextRound()">Next →</button>
+    <button id="next-btn">Next â†’</button>
   </div>
 
   <div id="summary" hidden></div>
 
 </div>
 
-<script>
-// ═══════════════════════════════════════════════════════════════
-// Config
-// ═══════════════════════════════════════════════════════════════
-const CFG = {
-  storage_key: 'clock-toy-gym',
-  rounds_per_session: 10,
-  modes: {
-    free:   { name: 'Free Play',          icon: '🎲', desc: 'No timer. Roll, set, play around.',                  timed: false },
-    drill1: { name: 'Set the Clock',      icon: '🎯', desc: 'Roll. Match the time with hands AND sliders.',        timed: true  },
-    drill2: { name: 'Read the Clock',     icon: '👀', desc: 'Hands are set. Slide the sliders to read the time.',  timed: true  },
-    drill3: { name: 'Build from Sliders', icon: '🔧', desc: 'Sliders are set. Place the hands to match.',          timed: true  },
-  },
-  difficulties: {
-    easy:   { name: 'Easy',   icon: '🌱', desc: 'Half-hour times only',     timer: 25, plateau: 14000, minuteStep: 30, hourDrift: false },
-    medium: { name: 'Medium', icon: '🌿', desc: 'Every 5 minutes',          timer: 15, plateau:  9000, minuteStep:  5, hourDrift: false },
-    hard:   { name: 'Hard',   icon: '🌳', desc: 'Any minute, hour drifts',  timer: 10, plateau:  6000, minuteStep:  1, hourDrift: true  },
-  },
-};
-const PASS = 0.80, PROMOTE = 0.90, FALLBACK = 0.60;
-const CIRC = 170, SRING = 220;
-
-const HOUR_COLORS = [
-  '#e63946', '#f4845f', '#f9a826', '#fdcb44',
-  '#c0d72d', '#66bb6a', '#4db6ac', '#4dd0e1',
-  '#5e9eff', '#7986cb', '#ba68c8', '#f06292',
-];
-
-// ═══════════════════════════════════════════════════════════════
-// Mutable state
-// ═══════════════════════════════════════════════════════════════
-let MODE = null, DIFF = null;
-let ROUND = null;
-let STATE = freshState();
-let cur = 0, results = [], streak = 0;
-let timerStart = 0, tInterval = null, answered = false;
-
-function freshState(){
-  return {
-    handH: 12, handM: 0,
-    sliderH: 12, sliderM: 0,
-    locked: { handH:false, handM:false, sliderH:false, sliderM:false },
-  };
-}
-
-// ═══════════════════════════════════════════════════════════════
-// Sky / sun / moon module
-// ═══════════════════════════════════════════════════════════════
-const SKY_STOPS = [
-  { h: 0,  top:[10,20,48],    bot:[26,37,71]   },
-  { h: 5,  top:[45,32,80],    bot:[90,58,111]  },
-  { h: 6,  top:[255,140,66],  bot:[253,180,98] },
-  { h: 8,  top:[135,206,235], bot:[184,224,245]},
-  { h: 12, top:[79,195,247],  bot:[129,212,250]},
-  { h: 15, top:[95,184,232],  bot:[163,213,240]},
-  { h: 17, top:[255,179,71],  bot:[255,140,66] },
-  { h: 18, top:[255,107,53],  bot:[196,69,105] },
-  { h: 19, top:[123,45,142],  bot:[61,43,86]   },
-  { h: 21, top:[26,37,71],    bot:[10,20,48]   },
-  { h: 24, top:[10,20,48],    bot:[26,37,71]   },
-];
-function lerp(a,b,t){ return a.map((v,i)=>Math.round(v+(b[i]-v)*t)); }
-function skyForTime(h24, m){
-  const t = h24 + m/60;
-  let i = 0;
-  while (i < SKY_STOPS.length-1 && SKY_STOPS[i+1].h <= t) i++;
-  const a = SKY_STOPS[i], b = SKY_STOPS[Math.min(i+1, SKY_STOPS.length-1)];
-  const f = b.h === a.h ? 0 : (t - a.h) / (b.h - a.h);
-  const top = lerp(a.top, b.top, f);
-  const bot = lerp(a.bot, b.bot, f);
-  // Sun walks the full 24-hour cycle: east horizon at midnight (t=0) → peak at
-  // noon (t=12) → west horizon at the next midnight (t=24). Always visible.
-  const sunVisible  = true;
-  const sunAngle    = (t / 24) * 180;
-  const moonVisible = false;
-  const moonAngle   = -1;
-  // Stars fade in at night (dark-sky hours) and fade out around dawn/dusk.
-  let starsOpacity = 0;
-  if (h24 < 6 || h24 >= 18){
-    const d = Math.min(t, 24 - t);
-    starsOpacity = Math.max(0, Math.min(1, 1 - d / 6));
-  }
-  return {
-    skyTop: `rgb(${top.join(',')})`,
-    skyBot: `rgb(${bot.join(',')})`,
-    sunVisible, sunAngle, moonVisible, moonAngle, starsOpacity,
-  };
-}
-function arcCoords(angle){
-  // Half-ellipse over the top sky strip. Wide horizontal axis,
-  // narrow vertical axis so noon peaks high and dawn/dusk land at the sides.
-  const vw = window.innerWidth;
-  const vh = window.innerHeight;
-  const cx = vw / 2;
-  const cy = 130;                           // arc center near board's top edge
-  const a  = Math.max(160, vw / 2 - 40);    // horizontal semi-axis
-  const b  = 110;                           // vertical semi-axis
-  const r  = (180 - angle) * Math.PI / 180;
-  return { x: cx + a * Math.cos(r), y: cy - b * Math.sin(r) };
-}
-function applySky(h24, m){
-  const s = skyForTime(h24, m);
-  document.body.style.background = `linear-gradient(180deg, ${s.skyTop}, ${s.skyBot})`;
-  const sun  = document.getElementById('sun');
-  const moon = document.getElementById('moon');
-  const stars= document.getElementById('stars');
-  if (s.sunVisible){
-    const p = arcCoords(s.sunAngle);
-    sun.style.left = p.x.toFixed(1) + 'px';
-    sun.style.top  = p.y.toFixed(1) + 'px';
-    sun.classList.remove('hidden');
-  } else sun.classList.add('hidden');
-  if (s.moonVisible){
-    const p = arcCoords(s.moonAngle);
-    moon.style.left = p.x.toFixed(1) + 'px';
-    moon.style.top  = p.y.toFixed(1) + 'px';
-    moon.classList.remove('hidden');
-  } else moon.classList.add('hidden');
-  stars.style.opacity = s.starsOpacity;
-}
-function buildSky(){
-  const ns = 'http://www.w3.org/2000/svg';
-  const stars = document.getElementById('stars');
-  stars.innerHTML = '';
-  let s = 1234;
-  const rnd = () => { s = (s * 9301 + 49297) % 233280; return s / 233280; };
-  for (let i = 0; i < 40; i++){
-    const c = document.createElementNS(ns,'circle');
-    c.setAttribute('cx', (rnd()*1000).toFixed(1));
-    c.setAttribute('cy', (rnd()*300).toFixed(1));
-    c.setAttribute('r',  (1 + rnd()*1.6).toFixed(2));
-    c.setAttribute('fill', '#ffffff');
-    if (i % 3 === 0) c.style.animation = `twinkle ${(2 + rnd()*2.5).toFixed(2)}s infinite alternate`;
-    stars.appendChild(c);
-  }
-  applySky(12, 0);
-}
-
-// ═══════════════════════════════════════════════════════════════
-// Clock SVG
-// ═══════════════════════════════════════════════════════════════
-function buildClock(){
-  const ns = 'http://www.w3.org/2000/svg';
-  const svg = document.getElementById('clock');
-  svg.innerHTML = '';
-  const cx = 200, cy = 200, r = 170;
-
-  const face = document.createElementNS(ns,'circle');
-  face.setAttribute('class','face');
-  face.setAttribute('cx',cx); face.setAttribute('cy',cy); face.setAttribute('r',r);
-  svg.appendChild(face);
-
-  // 60 ticks
-  for (let i = 0; i < 60; i++){
-    const th = (i*6 - 90) * Math.PI/180;
-    const tx = cx + (r-14) * Math.cos(th);
-    const ty = cy + (r-14) * Math.sin(th);
-    const c = document.createElementNS(ns,'circle');
-    c.setAttribute('cx', tx.toFixed(1));
-    c.setAttribute('cy', ty.toFixed(1));
-    c.setAttribute('r', i % 5 === 0 ? 4 : 1.8);
-    c.setAttribute('class', 'tick' + (i % 5 === 0 ? ' big' : ''));
-    svg.appendChild(c);
-    if (i % 5 === 0){
-      const num = i === 0 ? 60 : i;
-      const lx = cx + (r-30) * Math.cos(th);
-      const ly = cy + (r-30) * Math.sin(th);
-      const t = document.createElementNS(ns,'text');
-      t.setAttribute('x', lx.toFixed(1));
-      t.setAttribute('y', ly.toFixed(1));
-      t.setAttribute('class','tick-num');
-      t.textContent = num;
-      svg.appendChild(t);
-    }
-  }
-  // 12 hour bubbles
-  for (let h = 1; h <= 12; h++){
-    const th = (h*30 - 90) * Math.PI/180;
-    const bx = cx + (r-58) * Math.cos(th);
-    const by = cy + (r-58) * Math.sin(th);
-    const g = document.createElementNS(ns,'g');
-    g.setAttribute('class','hour-bubble');
-    const disc = document.createElementNS(ns,'circle');
-    disc.setAttribute('cx', bx.toFixed(1));
-    disc.setAttribute('cy', by.toFixed(1));
-    disc.setAttribute('r', 19);
-    disc.setAttribute('fill', HOUR_COLORS[h-1]);
-    disc.setAttribute('class','hour-disc');
-    g.appendChild(disc);
-    const t = document.createElementNS(ns,'text');
-    t.setAttribute('x', bx.toFixed(1));
-    t.setAttribute('y', by.toFixed(1));
-    t.setAttribute('class','hour-num');
-    t.textContent = h;
-    g.appendChild(t);
-    svg.appendChild(g);
-  }
-  // Minute hand
-  const handM = document.createElementNS(ns,'line');
-  handM.setAttribute('id','hand-m');
-  handM.setAttribute('x1', cx); handM.setAttribute('y1', cy);
-  handM.setAttribute('x2', cx); handM.setAttribute('y2', cy - 128);
-  svg.appendChild(handM);
-  // Hour hand
-  const handH = document.createElementNS(ns,'line');
-  handH.setAttribute('id','hand-h');
-  handH.setAttribute('x1', cx); handH.setAttribute('y1', cy);
-  handH.setAttribute('x2', cx); handH.setAttribute('y2', cy - 80);
-  svg.appendChild(handH);
-  // Pivot
-  const pivot = document.createElementNS(ns,'circle');
-  pivot.setAttribute('class','pivot');
-  pivot.setAttribute('cx', cx); pivot.setAttribute('cy', cy); pivot.setAttribute('r', 7);
-  svg.appendChild(pivot);
-
-  attachHandDrag();
-}
-
-function hourDisplayAngle(){
-  const drift = CFG.difficulties[DIFF || 'easy'].hourDrift;
-  const Hmod = STATE.handH % 12;
-  return 30 * Hmod + (drift ? 0.5 * STATE.handM : 0);
-}
-function renderHands(){
-  const handH = document.getElementById('hand-h');
-  const handM = document.getElementById('hand-m');
-  if (handH) handH.setAttribute('transform', `rotate(${hourDisplayAngle().toFixed(2)} 200 200)`);
-  if (handM) handM.setAttribute('transform', `rotate(${(6 * STATE.handM).toFixed(2)} 200 200)`);
-}
-
-// ═══════════════════════════════════════════════════════════════
-// Drag — clock hands
-// ═══════════════════════════════════════════════════════════════
-function attachHandDrag(){
-  const svg   = document.getElementById('clock');
-  const handH = document.getElementById('hand-h');
-  const handM = document.getElementById('hand-m');
-  let dragKind = null, pid = null, hadMove = false;
-
-  function angleFrom(e){
-    const rect = svg.getBoundingClientRect();
-    const cx = rect.left + rect.width / 2;
-    const cy = rect.top  + rect.height / 2;
-    const dx = e.clientX - cx;
-    const dy = e.clientY - cy;
-    let deg = Math.atan2(dx, -dy) * 180 / Math.PI;
-    if (deg < 0) deg += 360;
-    return deg;
-  }
-  function angleDist(a,b){
-    let d = Math.abs(a - b) % 360;
-    return Math.min(d, 360 - d);
-  }
-
-  function begin(kind, e){
-    if (!MODE || !DIFF) return;
-    const lockedKey = kind === 'hour' ? 'handH' : 'handM';
-    if (STATE.locked[lockedKey]) return;
-    dragKind = kind;
-    pid = e.pointerId;
-    hadMove = false;
-    try { svg.setPointerCapture(pid); } catch {}
-    (kind === 'hour' ? handH : handM).setAttribute('data-dragging','true');
-    e.preventDefault();
-  }
-  function move(e){
-    if (dragKind === null || e.pointerId !== pid) return;
-    hadMove = true;
-    apply(dragKind, angleFrom(e));
-  }
-  function end(e){
-    if (dragKind === null) return;
-    if (e.pointerId !== pid) return;
-    try { svg.releasePointerCapture(pid); } catch {}
-    handH.removeAttribute('data-dragging');
-    handM.removeAttribute('data-dragging');
-    dragKind = null; pid = null;
-  }
-  function apply(kind, angle){
-    if (kind === 'hour'){
-      const drift = CFG.difficulties[DIFF].hourDrift;
-      const offset = drift ? 0.5 * STATE.handM : 0;
-      let H = Math.round((angle - offset) / 30);
-      H = ((H - 1) % 12 + 12) % 12 + 1;
-      STATE.handH = H;
-    } else {
-      const step = CFG.difficulties[DIFF].minuteStep;
-      const stepDeg = step * 6;
-      let M = Math.round(angle / stepDeg) * step;
-      if (M >= 60) M = 0;
-      STATE.handM = M;
-    }
-    renderHands();
-    if (MODE === 'free') applySkyFromState();
-  }
-
-  handH.addEventListener('pointerdown', e => begin('hour', e));
-  handM.addEventListener('pointerdown', e => begin('minute', e));
-  svg.addEventListener('pointerdown', e => {
-    if (dragKind !== null) return;
-    if (!MODE || !DIFF) return;
-    if (e.target === handH || e.target === handM) return;
-    const angle = angleFrom(e);
-    const hourAvail = !STATE.locked.handH;
-    const minAvail  = !STATE.locked.handM;
-    if (!hourAvail && !minAvail) return;
-    const dH = hourAvail ? angleDist(angle, hourDisplayAngle()) : Infinity;
-    const dM = minAvail  ? angleDist(angle, 6 * STATE.handM)    : Infinity;
-    const pick = dH <= dM ? 'hour' : 'minute';
-    begin(pick, e);
-    apply(pick, angle);
-  });
-  svg.addEventListener('pointermove', move);
-  svg.addEventListener('pointerup', end);
-  svg.addEventListener('pointercancel', end);
-}
-
-// ═══════════════════════════════════════════════════════════════
-// Sliders
-// ═══════════════════════════════════════════════════════════════
-function attachSliders(){
-  attachSlider('hour',   1, 12, 1);
-  attachSlider('minute', 0, 60, 5);
-}
-function buildTicks(kind, min, max, step){
-  const labels = document.getElementById(kind + '-ticks');
-  labels.innerHTML = '';
-  const vals = [];
-  for (let v = min; v <= max; v += step) vals.push(v);
-  vals.forEach(v => {
-    const span = document.createElement('span');
-    span.className = 'rail-tick';
-    if (kind === 'minute' && v === max) span.textContent = '0/60';
-    else if (kind === 'minute' && v % 10 !== 0 && v !== 0 && v !== 60) span.textContent = '';
-    else span.textContent = v;
-    labels.appendChild(span);
-  });
-  return vals;
-}
-function attachSlider(kind, min, max, step){
-  const rail = document.getElementById(kind + '-rail');
-  const knob = document.getElementById(kind + '-knob');
-  const vals = buildTicks(kind, min, max, step);
-  let dragging = false, pid = null;
-  function valueFromX(clientX){
-    const rect = rail.getBoundingClientRect();
-    const pad = 22;
-    const usable = Math.max(1, rect.width - 2*pad);
-    const relX = Math.max(0, Math.min(usable, clientX - rect.left - pad));
-    const frac = relX / usable;
-    const idx = Math.round(frac * (vals.length - 1));
-    return vals[idx];
-  }
-  function start(e){
-    if (!MODE || !DIFF) return;
-    const lockedKey = kind === 'hour' ? 'sliderH' : 'sliderM';
-    if (STATE.locked[lockedKey]) return;
-    dragging = true; pid = e.pointerId;
-    try { rail.setPointerCapture(pid); } catch {}
-    rail.setAttribute('data-dragging','true');
-    setVal(valueFromX(e.clientX));
-    e.preventDefault();
-  }
-  function move(e){
-    if (!dragging || e.pointerId !== pid) return;
-    setVal(valueFromX(e.clientX));
-  }
-  function end(e){
-    if (!dragging) return;
-    if (e.pointerId !== pid) return;
-    try { rail.releasePointerCapture(pid); } catch {}
-    rail.removeAttribute('data-dragging');
-    dragging = false; pid = null;
-  }
-  function setVal(v){
-    if (kind === 'hour') STATE.sliderH = v;
-    else STATE.sliderM = (v === 60 ? 0 : v);
-    renderSlider(kind);
-    if (MODE === 'free') applySkyFromState();
-  }
-  rail.addEventListener('pointerdown', start);
-  rail.addEventListener('pointermove', move);
-  rail.addEventListener('pointerup',   end);
-  rail.addEventListener('pointercancel', end);
-}
-function renderSlider(kind){
-  const rail = document.getElementById(kind + '-rail');
-  const knob = document.getElementById(kind + '-knob');
-  const rect = rail.getBoundingClientRect();
-  if (rect.width === 0){
-    requestAnimationFrame(() => renderSlider(kind));
-    return;
-  }
-  const pad = 22;
-  const usable = rect.width - 2*pad;
-  let v, idx, total;
-  if (kind === 'hour'){
-    v = STATE.sliderH; idx = v - 1; total = 11;
-  } else {
-    v = STATE.sliderM; idx = v / 5; total = 12;
-  }
-  const x = pad + (idx / total) * usable;
-  knob.style.left = x + 'px';
-  knob.textContent = v;
-}
-
-// ═══════════════════════════════════════════════════════════════
-// Mode / difficulty pickers
-// ═══════════════════════════════════════════════════════════════
-function buildPickers(){
-  const mg = document.getElementById('mode-grid');
-  Object.entries(CFG.modes).forEach(([k, m]) => {
-    const c = document.createElement('div');
-    c.className = 'sel-card';
-    c.onclick = () => pickMode(k);
-    c.innerHTML = `<div class="sel-badge">${m.icon}</div><div class="sel-name">${m.name}</div><div class="sel-desc">${m.desc}</div>`;
-    mg.appendChild(c);
-  });
-  const dg = document.getElementById('diff-grid');
-  Object.entries(CFG.difficulties).forEach(([k, d]) => {
-    const c = document.createElement('div');
-    c.className = 'sel-card';
-    c.onclick = () => pickDifficulty(k);
-    c.innerHTML = `<div class="sel-badge">${d.icon}</div><div class="sel-name">${d.name}</div><div class="sel-desc">${d.desc}<br><b>${d.timer}s/round</b></div>`;
-    dg.appendChild(c);
-  });
-}
-function pickMode(m){
-  MODE = m;
-  document.getElementById('mode-sel').hidden = true;
-  document.getElementById('diff-sel').hidden = false;
-  document.getElementById('mode-pill').textContent = CFG.modes[m].name;
-}
-function pickDifficulty(d){
-  DIFF = d;
-  document.getElementById('diff-sel').hidden = true;
-  document.getElementById('play').hidden = false;
-  document.getElementById('mode-pill').textContent = `${CFG.modes[MODE].name} · ${CFG.difficulties[d].name}`;
-
-  const timed = CFG.modes[MODE].timed;
-  document.getElementById('prog-track').style.display = timed ? '' : 'none';
-  document.getElementById('timer-wrap').style.display = timed ? '' : 'none';
-  document.getElementById('stats-row').style.display  = timed ? '' : 'none';
-
-  const pt = document.getElementById('prog-track');
-  pt.innerHTML = '';
-  if (timed){
-    for (let i = 0; i < CFG.rounds_per_session; i++){
-      const e = document.createElement('div');
-      e.className = 'pd'; e.id = 'pd' + i;
-      pt.appendChild(e);
-    }
-  }
-  const sd = document.getElementById('sdots');
-  sd.innerHTML = '';
-  for (let i = 0; i < 5; i++){
-    const e = document.createElement('div');
-    e.className = 'sdot'; e.id = 'sd' + i;
-    sd.appendChild(e);
-  }
-  cur = 0; results = []; streak = 0;
-  newRound();
-}
-
-// ═══════════════════════════════════════════════════════════════
-// Round flow
-// ═══════════════════════════════════════════════════════════════
-function nextTarget(){
-  const step = CFG.difficulties[DIFF].minuteStep;
-  const period = Math.random() < 0.5 ? 'am' : 'pm';
-  const hour = 1 + Math.floor(Math.random() * 12);
-  let minute;
-  if (step === 30) minute = Math.random() < 0.5 ? 0 : 30;
-  else if (step === 5) minute = Math.floor(Math.random() * 12) * 5;
-  else minute = Math.floor(Math.random() * 60);
-  const hour24 = period === 'am' ? (hour === 12 ? 0 : hour) : (hour === 12 ? 12 : hour + 12);
-  return { hour, minute, hour24, period, mode: MODE, difficulty: DIFF };
-}
-
-function newRound(){
-  answered = false;
-  ROUND = nextTarget();
-  STATE = freshState();
-
-  if (MODE === 'drill2'){
-    STATE.handH = ROUND.hour;
-    STATE.handM = ROUND.minute;
-    STATE.locked.handH = true;
-    STATE.locked.handM = true;
-  } else if (MODE === 'drill3'){
-    STATE.sliderH = ROUND.hour;
-    STATE.sliderM = ROUND.minute;
-    STATE.locked.sliderH = true;
-    STATE.locked.sliderM = true;
-  }
-
-  document.getElementById('hand-h').setAttribute('data-locked', STATE.locked.handH);
-  document.getElementById('hand-m').setAttribute('data-locked', STATE.locked.handM);
-  document.getElementById('hour-rail').setAttribute('data-locked', STATE.locked.sliderH);
-  document.getElementById('minute-rail').setAttribute('data-locked', STATE.locked.sliderM);
-
-  renderHands();
-  renderSlider('hour');
-  renderSlider('minute');
-
-  const dice = document.getElementById('dice');
-  const td   = document.getElementById('target-display');
-  const rb   = document.getElementById('roll-btn');
-  if (MODE === 'drill2' || MODE === 'drill3'){
-    dice.style.visibility = 'hidden';
-    rb.style.visibility = 'hidden';
-    td.textContent = MODE === 'drill2' ? 'Read the clock!' : 'Match the sliders!';
-  } else {
-    dice.style.visibility = '';
-    rb.style.visibility = '';
-    if (MODE === 'drill1'){
-      td.textContent = formatTime(ROUND) + ' ' + ((ROUND.hour24 >= 6 && ROUND.hour24 < 18) ? '☀' : '🌙');
-      animateDiceTo(ROUND);
-    } else {
-      td.textContent = formatTime(ROUND) + ' ' + ((ROUND.hour24 >= 6 && ROUND.hour24 < 18) ? '☀' : '🌙');
-      animateDiceTo(ROUND);
-    }
-  }
-
-  document.getElementById('hint-btn').style.display = (MODE === 'drill2') ? '' : 'none';
-
-  if (CFG.modes[MODE].timed){
-    for (let i = 0; i < CFG.rounds_per_session; i++){
-      const e = document.getElementById('pd' + i);
-      if (!e) continue;
-      if (i < cur)       e.className = results[i]?.correct ? 'pd done-ok' : 'pd done-bad';
-      else if (i === cur) e.className = 'pd cur';
-      else                e.className = 'pd';
-    }
-  }
-
-  applySkyFromRound();
-
-  document.getElementById('fb').style.display = 'none';
-  document.getElementById('next-btn').style.display = 'none';
-  document.getElementById('check-btn').style.display = '';
-
-  if (CFG.modes[MODE].timed){
-    timerStart = Date.now();
-    clearInterval(tInterval);
-    tInterval = setInterval(tick, 100);
-    setBar(1);
-  } else {
-    clearInterval(tInterval);
-  }
-}
-
-function applySkyFromRound(){
-  if (MODE === 'free') applySkyFromState();
-  else                 applySky(ROUND.hour24, ROUND.minute);
-}
-function applySkyFromState(){
-  // Free Play interprets current hand position as AM.
-  const h = STATE.handH === 12 ? 0 : STATE.handH;
-  applySky(h, STATE.handM);
-}
-
-function formatTime(r){
-  return `${r.hour}:${r.minute.toString().padStart(2,'0')}`;
-}
-
-function tick(){
-  if (answered) return;
-  const T = CFG.difficulties[DIFF].timer;
-  const f = Math.max(0, 1 - (Date.now() - timerStart) / 1000 / T);
-  setBar(f);
-  if (f <= 0){ clearInterval(tInterval); onTimeout(); }
-}
-function setBar(f){
-  const b = document.getElementById('timer-bar');
-  b.style.width = (f * 100) + '%';
-  b.style.background = f > 0.5 ? 'var(--ok)' : f > 0.25 ? 'var(--warn)' : 'var(--bad)';
-}
-
-function onTimeout(){
-  answered = true;
-  results.push({
-    correct: false, latency: CFG.difficulties[DIFF].timer * 1000,
-    timeout: true, type: MODE, errors: ['ran out of time'],
-  });
-  streak = 0;
-  showFeedback(false, ROUND, true, []);
-  updateStats();
-}
-
-function rollDice(){
-  if (MODE === 'free'){
-    ROUND = nextTarget();
-    document.getElementById('target-display').textContent =
-      formatTime(ROUND) + ' ' + ((ROUND.hour24 >= 6 && ROUND.hour24 < 18) ? '☀' : '🌙');
-    applySkyFromRound();
-    document.getElementById('fb').style.display = 'none';
-  }
-  animateDiceTo(ROUND);
-}
-
-function animateDiceTo(r){
-  const dice = document.getElementById('dice');
-  dice.classList.remove('rolling');
-  void dice.offsetWidth;
-  dice.classList.add('rolling');
-  setTimeout(() => {
-    const icon = (r.hour24 >= 6 && r.hour24 < 18) ? '☀' : '🌙';
-    dice.innerHTML = `<div class="dice-time">${formatTime(r)}</div><div class="dice-period">${icon} ${r.period.toUpperCase()}</div>`;
-  }, 450);
-}
-
-function checkAnswer(){
-  if (answered && CFG.modes[MODE].timed) return;
-  const errors = [];
-  if (!STATE.locked.handH   && STATE.handH   !== ROUND.hour)   errors.push('hour hand');
-  if (!STATE.locked.handM   && STATE.handM   !== ROUND.minute) errors.push('minute hand');
-  if (!STATE.locked.sliderH && STATE.sliderH !== ROUND.hour)   errors.push('hour slider');
-  if (!STATE.locked.sliderM && STATE.sliderM !== ROUND.minute) errors.push('minute slider');
-  const ok = errors.length === 0;
-
-  if (CFG.modes[MODE].timed){
-    answered = true;
-    clearInterval(tInterval);
-    const lat = Date.now() - timerStart;
-    results.push({ correct: ok, latency: lat, timeout: false, type: MODE, errors: errors.slice() });
-    streak = ok ? streak + 1 : 0;
-    updateStats();
-  }
-  showFeedback(ok, ROUND, false, errors);
-}
-
-function showHint(){
-  if (MODE !== 'drill2') return;
-  const fb = document.getElementById('fb');
-  fb.className = 'hint';
-  fb.style.display = 'block';
-  fb.innerHTML = `<div class="fv">💡 Reading the minute hand</div>
-    <div>The <b style="color:var(--hand-m)">blue hand</b> always points at a tick on the outer ring.<br>
-    The little number (5, 10, 15… 60) at that tick is the minute — <b>not</b> the big hour bubble underneath.</div>`;
-}
-
-function nicePartOfDay(h24){
-  if (h24 >= 5 && h24 < 12) return 'morning';
-  if (h24 >= 12 && h24 < 17) return 'afternoon';
-  if (h24 >= 17 && h24 < 20) return 'evening';
-  return 'night';
-}
-
-function showFeedback(ok, r, timeout, errors){
-  const fb = document.getElementById('fb');
-  fb.style.display = 'block';
-  fb.className = ok ? 'ok' : 'bad';
-  let title, body;
-  if (timeout){
-    title = `⏱ Time's up! The time was ${formatTime(r)}.`;
-    body  = `Try to read the clock a little quicker next round.`;
-  } else if (ok){
-    title = `✓ ${formatTime(r)} — exactly right!`;
-    body  = `That's ${formatTime(r)} in the ${nicePartOfDay(r.hour24)}. ${(r.hour24 >= 6 && r.hour24 < 18) ? '☀' : '🌙'}`;
-  } else {
-    title = `Almost! Check the ${errors[0]}.`;
-    body  = `Target was <b>${formatTime(r)}</b> (hour ${r.hour}, minute ${r.minute}).`;
-    if (errors.length > 1) body += ` (${errors.length} parts to fix)`;
-  }
-  fb.innerHTML = `<div class="fv">${title}</div><div>${body}</div>`;
-  if (CFG.modes[MODE].timed){
-    document.getElementById('check-btn').style.display = 'none';
-    document.getElementById('next-btn').style.display = 'block';
-  }
-}
-
-function nextRound(){
-  cur++;
-  if (CFG.modes[MODE].timed && cur >= CFG.rounds_per_session) showSummary();
-  else newRound();
-}
-
-function updateStats(){
-  const n = results.length; if (!n) return;
-  const c = results.filter(r => r.correct).length;
-  const acc = c / n;
-  const avgLat = results.reduce((s, r) => s + r.latency, 0) / n;
-  const rf = document.getElementById('r-fill');
-  rf.style.strokeDashoffset = CIRC * (1 - acc);
-  rf.style.stroke = acc >= PASS ? 'var(--ok)' : acc >= FALLBACK ? 'var(--warn)' : 'var(--bad)';
-  document.getElementById('r-pct').textContent = Math.round(acc * 100) + '%';
-  const T = CFG.difficulties[DIFF].timer, P = CFG.difficulties[DIFF].plateau;
-  const maxLat = T * 1000;
-  const lf = Math.min(avgLat / maxLat, 1);
-  const lb = document.getElementById('lat-bar');
-  lb.style.width = (lf * 100) + '%';
-  lb.style.background = avgLat <= P ? 'var(--ok)' : avgLat <= maxLat * 0.9 ? 'var(--warn)' : 'var(--bad)';
-  document.getElementById('lat-txt').textContent = (avgLat / 1000).toFixed(1) + 's';
-  for (let i = 0; i < 5; i++){
-    const e = document.getElementById('sd' + i);
-    e.className = i < streak ? 'sdot lit' : 'sdot';
-  }
-}
-
-function showSummary(){
-  clearInterval(tInterval);
-  document.getElementById('play').hidden = true;
-
-  const n = results.length;
-  const c = results.filter(r => r.correct).length;
-  const acc = c / n;
-  const avgLat = results.reduce((s, r) => s + r.latency, 0) / n;
-  const timeouts = results.filter(r => r.timeout).length;
-  const ms = results.reduce((s, r) => r.correct
-    ? { max: Math.max(s.max, s.cur + 1), cur: s.cur + 1 }
-    : { max: s.max, cur: 0 }, { max: 0, cur: 0 }).max;
-
-  const errorCounts = { 'hour hand': 0, 'minute hand': 0, 'hour slider': 0, 'minute slider': 0 };
-  results.forEach(r => (r.errors || []).forEach(e => { if (errorCounts[e] !== undefined) errorCounts[e]++; }));
-  const errorRows = Object.entries(errorCounts)
-    .filter(([, v]) => v > 0)
-    .map(([k, v]) => `<div class="error-row"><div class="error-key">${k} misses</div><div class="error-cnt">${v}</div></div>`)
-    .join('') || `<div class="error-row"><div class="error-key">No misses</div><div class="error-cnt" style="color:var(--ok)">✓</div></div>`;
-
-  const P = CFG.difficulties[DIFF].plateau;
-  const nextD = DIFF === 'easy' ? 'medium' : DIFF === 'medium' ? 'hard' : 'hard';
-  let verdict;
-  if (acc >= PROMOTE && avgLat <= P) verdict = `<strong>🎉 Promote!</strong> Ready for <b>${CFG.difficulties[nextD].name}</b>.`;
-  else if (acc >= PASS)               verdict = `<strong>✓ Pass.</strong> Repeat <b>${CFG.difficulties[DIFF].name}</b> to build speed.`;
-  else if (acc >= FALLBACK)           verdict = `<strong>Keep going!</strong> Repeat <b>${CFG.difficulties[DIFF].name}</b> and study the misses.`;
-  else                                verdict = `<strong>Try Easy mode first</strong> to lock in the basics.`;
-
-  const sColor = acc >= PASS ? 'var(--ok)' : acc >= FALLBACK ? 'var(--warn)' : 'var(--bad)';
-  const sumEl = document.getElementById('summary');
-  sumEl.innerHTML = `
-    <h2>Session Complete!</h2>
-    <div class="sum-hero">
-      <div class="sum-ring">
-        <svg viewBox="0 0 96 96"><circle class="sr-bg" cx="48" cy="48" r="35"/><circle class="sr-fill" id="sr-fill" cx="48" cy="48" r="35" style="stroke:${sColor};stroke-dashoffset:${SRING}"/></svg>
-        <div class="sum-ring-label"><div class="srl-pct" style="color:${sColor}">${c}/${n}</div><div class="srl-sub">correct</div></div>
-      </div>
-      <div class="sum-stats">
-        <div class="ss-row"><span class="ss-k">Accuracy</span><span class="ss-v" style="color:${sColor}">${Math.round(acc * 100)}%</span></div>
-        <div class="ss-row"><span class="ss-k">Avg time</span><span class="ss-v">${(avgLat / 1000).toFixed(1)}s</span></div>
-        <div class="ss-row"><span class="ss-k">Best streak</span><span class="ss-v">${ms}</span></div>
-        <div class="ss-row"><span class="ss-k">Timeouts</span><span class="ss-v" style="color:${timeouts > 0 ? 'var(--bad)' : 'var(--ok)'}">${timeouts}</span></div>
-      </div>
-    </div>
-    <div class="error-chart">${errorRows}</div>
-    <div class="vbanner">${verdict}</div>
-    <button class="restart-btn" onclick="restartSame()">↻ Try again</button>
-    <button class="restart-btn" onclick="restartFromMode()">↩ Choose mode</button>
-  `;
-  sumEl.hidden = false;
-  setTimeout(() => {
-    const f = document.getElementById('sr-fill');
-    if (f) f.style.strokeDashoffset = SRING * (1 - acc);
-  }, 50);
-
-  const hist = JSON.parse(localStorage.getItem(CFG.storage_key) || '[]');
-  hist.push({
-    date: new Date().toISOString(),
-    mode: MODE, difficulty: DIFF,
-    correct: c, total: n,
-    acc: Math.round(acc * 100),
-    avgLatMs: Math.round(avgLat),
-  });
-  localStorage.setItem(CFG.storage_key, JSON.stringify(hist.slice(-20)));
-}
-
-function restartSame(){
-  document.getElementById('summary').hidden = true;
-  document.getElementById('play').hidden = false;
-  cur = 0; results = []; streak = 0;
-  for (let i = 0; i < CFG.rounds_per_session; i++){
-    const d = document.getElementById('pd' + i);
-    if (d) d.className = 'pd';
-  }
-  for (let i = 0; i < 5; i++){
-    const e = document.getElementById('sd' + i);
-    if (e) e.className = 'sdot';
-  }
-  document.getElementById('r-pct').textContent = '—';
-  document.getElementById('r-fill').style.strokeDashoffset = CIRC;
-  document.getElementById('lat-bar').style.width = '0%';
-  document.getElementById('lat-txt').textContent = '—';
-  newRound();
-}
-function restartFromMode(){
-  document.getElementById('summary').hidden = true;
-  document.getElementById('diff-sel').hidden = true;
-  document.getElementById('play').hidden = true;
-  document.getElementById('mode-sel').hidden = false;
-  document.getElementById('mode-pill').textContent = 'Choose Mode';
-  clearInterval(tInterval);
-  MODE = null; DIFF = null;
-}
-
-// ═══════════════════════════════════════════════════════════════
-// Boot
-// ═══════════════════════════════════════════════════════════════
-buildPickers();
-buildSky();
-buildClock();
-attachSliders();
-renderHands();
-renderSlider('hour');
-renderSlider('minute');
-
-window.addEventListener('resize', () => {
-  renderSlider('hour');
-  renderSlider('minute');
-  if (ROUND) applySkyFromRound();
-  else applySky(12, 0);
-});
-
-// Debug hooks for verification
-window.__clock = { STATE: () => STATE, ROUND: () => ROUND, MODE: () => MODE, DIFF: () => DIFF, applySky };
-</script>
+<script type="module" src="src/main.js"></script>
 </body>
 </html>

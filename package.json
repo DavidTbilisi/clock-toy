@@ -1,0 +1,17 @@
+{
+  "name": "clock-toy",
+  "private": true,
+  "version": "0.0.0",
+  "description": "Clock-reading practice toy — see index.html. This package.json only exists for the Playwright e2e test setup.",
+  "scripts": {
+    "serve": "http-server -p 5510 -c-1 -s .",
+    "test": "playwright test",
+    "test:ui": "playwright test --ui",
+    "test:headed": "playwright test --headed",
+    "test:install": "playwright install chromium"
+  },
+  "devDependencies": {
+    "@playwright/test": "^1.49.0",
+    "http-server": "^14.1.1"
+  }
+}
