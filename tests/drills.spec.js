@@ -41,6 +41,8 @@ async function setHands(page, h, m) {
   await page.evaluate(({ h, m }) => {
     const s = window.__clock.STATE();
     s.handH = h; s.handM = m;
+    const r = window.__clock.ROUND();
+    if (r) window.__clock.setPeriod(r.period);
     renderHands();
   }, { h, m });
 }

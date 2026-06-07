@@ -207,4 +207,14 @@ window.__clock = {
   locale:     () => i18n.locale,
   setLocale:  (c) => i18n.setLocale(c),
   cycleLocale: () => i18n.cycleLocale(),
+  // Coverage probes — wire raw module instances onto a separate namespace so
+  // unit tests can exercise behaviour that doesn't surface through the main UI
+  // (event emission, store resets, audio toggle paths, i18n fallbacks).
+  _store:     store,
+  _audio:     audio,
+  _i18n:      i18n,
+  _history:   history,
+  _sky:       sky,
+  _feedback:  feedback,
+  _summary:   summary,
 };
