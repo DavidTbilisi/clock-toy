@@ -56,6 +56,7 @@ const els = {
   checkBtn:       $('check-btn'),
   nextBtn:        $('next-btn'),
   fb:             $('fb'),
+
 };
 
 // ── Module instances ────────────────────────────────────────
@@ -82,20 +83,38 @@ const pickers = new Pickers({
 });
 
 // ── Observer wiring (Store events → side effects) ───────────
-// In Free Play, dragging hands also drags the time of day.
+// In Free Play, dragging hands also drags the time of day. The 12-hour clock
+// face is ambiguous (one "12" stands for both noon and midnight), so the
+// AM/PM toggle below disambiguates explicitly into a 24-hour time.
+function applySkyFromHands() {
+  sky.apply(store.freePlayHour24(), store.STATE.handM);
+}
 store.on('hands:change', () => {
   clock.renderHands();
-  if (store.MODE === 'free') {
-    const h = store.STATE.handH === 12 ? 0 : store.STATE.handH;
-    sky.apply(h, store.STATE.handM);
-  }
+  if (store.MODE === 'free') applySkyFromHands();
 });
 store.on('sliders:change', (h, m) => {
-  // The store has already updated STATE; re-render the affected rail only.
-  // Both rails subscribe to the same event but render() reads from STATE so
-  // re-rendering both is fine (cheap; just sets `left` + `textContent`).
   sliders.render('hour');
   sliders.render('minute');
+});
+
+// Cycle detector: in Free Play, two full revolutions of the hour hand = one
+// full 24-hour day. The period auto-flips AM ↔ PM whenever the hand crosses
+// the 11↔12 boundary on the clock face. No visible toggle; the only way to
+// see the change is through the sky responding.
+let prevFreeHandH = null;
+store.on('mode:change', (m) => {
+  prevFreeHandH = m === 'free' ? store.STATE.handH : null;
+});
+store.on('hands:change', (h) => {
+  if (prevFreeHandH === null) return;
+  if ((prevFreeHandH === 11 && h === 12) || (prevFreeHandH === 12 && h === 11)) {
+    store.setPeriod(store.period === 'am' ? 'pm' : 'am');
+  }
+  prevFreeHandH = h;
+});
+store.on('period:change', () => {
+  if (store.MODE === 'free') applySkyFromHands();
 });
 
 // ── DOM event binding (replaces former inline onclick=…) ────
@@ -110,8 +129,7 @@ window.addEventListener('resize', () => {
   sliders.render('minute');
   if (store.ROUND) {
     if (store.MODE === 'free') {
-      const h = store.STATE.handH === 12 ? 0 : store.STATE.handH;
-      sky.apply(h, store.STATE.handM);
+      applySkyFromHands();
     } else {
       sky.apply(store.ROUND.hour24, store.ROUND.minute);
     }
@@ -138,5 +156,9 @@ window.__clock = {
   ROUND: () => store.ROUND,
   MODE:  () => store.MODE,
   DIFF:  () => store.DIFF,
+  period: () => store.period,
+  freePlayHour24: () => store.freePlayHour24(),
   applySky: (h, m) => sky.apply(h, m),
+  // Drive the store through its real setter so observers fire (used by tests).
+  setHandH: (h) => store.setHandH(h),
 };

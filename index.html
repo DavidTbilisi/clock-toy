@@ -40,6 +40,8 @@
   --r:22px;
   --r-sm:14px;
   --r-xs:10px;
+  /* Shared width for the clock + slider stack so the rails align with the clock's edges. */
+  --clock-width:min(380px,88vw);
   --shadow-card:0 6px 20px rgba(60,28,14,.18), 0 2px 4px rgba(60,28,14,.12);
   --shadow-deep:0 10px 30px rgba(60,28,14,.32), 0 4px 8px rgba(60,28,14,.16);
 }
@@ -64,9 +66,10 @@ body{
   position:fixed;
   width:140px;height:140px;
   transform:translate(-50%,-50%);
-  transition:left .8s ease,top .8s ease,opacity .8s ease;
+  transition:left .8s ease,top .8s ease,opacity .8s ease,transform 1.2s ease,filter 1.2s ease;
   pointer-events:none;
   z-index:0;
+  will-change:transform,filter;
 }
 .celestial-body svg{width:100%;height:100%;display:block;overflow:visible}
 .hidden{opacity:0!important}
@@ -251,10 +254,12 @@ body{
   border:3px solid var(--board-edge);
   border-radius:50%;
   padding:8px;
+  /* Parent #play is block-layout, so margin:auto handles horizontal centering. */
+  margin-left:auto;margin-right:auto;
   align-self:center;
   box-shadow:var(--shadow-deep), inset 0 0 0 6px rgba(122,58,30,.08);
   position:relative;
-  width:min(380px,88vw);
+  width:var(--clock-width);
   aspect-ratio:1;
 }
 #clock{width:100%;height:100%;display:block;touch-action:none;user-select:none}
@@ -272,6 +277,9 @@ body{
 
 /* ── Sliders ──────────────────────────────────────────────── */
 .sliders{
+  align-self:center;
+  margin-left:auto;margin-right:auto;
+  width:var(--clock-width);
   background:var(--board);
   border:2px solid var(--board-edge);
   border-radius:var(--r);

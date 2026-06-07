@@ -19,12 +19,32 @@ export class Store extends EventEmitter {
     this.ROUND = null;
     this.STATE = freshHandState();
 
+    // Default PM so Free Play opens with the bright noon sun (handH=12 + PM = 12:00).
+    // The 12-hour clock face is intrinsically ambiguous (one "12" stands for both
+    // midnight and noon); the AM/PM toggle in Free Play is what makes it explicit.
+    this.period = 'pm';
+
     // Session-level (resets each new session)
     this.cur = 0;
     this.results = [];
     this.streak = 0;
     this.timerStart = 0;
     this.answered = false;
+  }
+
+  // Translate the 12-hour hand position + period into a 24-hour hour. Standard
+  // AM/PM math: 12 AM = 0, 12 PM = 12, 1..11 AM = 1..11, 1..11 PM = 13..23.
+  freePlayHour24() {
+    const h = this.STATE.handH;
+    if (h === 12) return this.period === 'am' ? 0 : 12;
+    return h + (this.period === 'pm' ? 12 : 0);
+  }
+
+  setPeriod(p) {
+    if (p !== 'am' && p !== 'pm') return;
+    if (this.period === p) return;
+    this.period = p;
+    this.emit('period:change', p);
   }
 
   // ── Mode/Difficulty ─────────────────────────────────────────

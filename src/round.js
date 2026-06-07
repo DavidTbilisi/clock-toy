@@ -155,8 +155,7 @@ export class RoundRunner {
 
   _applySkyForRound() {
     if (this.store.MODE === 'free') {
-      const h = this.store.STATE.handH === 12 ? 0 : this.store.STATE.handH;
-      this.sky.apply(h, this.store.STATE.handM);
+      this.sky.apply(this.store.freePlayHour24(), this.store.STATE.handM);
     } else {
       this.sky.apply(this.store.ROUND.hour24, this.store.ROUND.minute);
     }

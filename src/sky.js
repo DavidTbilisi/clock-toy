@@ -32,6 +32,15 @@ export function skyForTime(h24, m) {
   const top = lerp(a.top, b.top, f);
   const bot = lerp(a.bot, b.bot, f);
   const sunAngle = (t / 24) * 180;
+
+  // dayFactor: 0 at midnight, peaks at 1 at solar noon, 0 again at next midnight.
+  // Drives sun size + glow so the sun grows huge and shines bright at midday.
+  const dayFactor = Math.sin((t / 24) * Math.PI);
+  const sunScale = 0.65 + 0.85 * dayFactor;
+  const sunBrightness = 0.7 + 0.8 * dayFactor;
+  const sunGlowPx = 4 + 38 * dayFactor;
+  const sunGlowAlpha = 0.15 + 0.6 * dayFactor;
+
   let starsOpacity = 0;
   if (h24 < 6 || h24 >= 18) {
     const d = Math.min(t, 24 - t);
@@ -41,6 +50,10 @@ export function skyForTime(h24, m) {
     skyTop: `rgb(${top.join(',')})`,
     skyBot: `rgb(${bot.join(',')})`,
     sunAngle,
+    sunScale,
+    sunBrightness,
+    sunGlowPx,
+    sunGlowAlpha,
     starsOpacity,
   };
 }
@@ -88,6 +101,11 @@ export class Sky {
     const p = arcCoords(s.sunAngle);
     this.sun.style.left = p.x.toFixed(1) + 'px';
     this.sun.style.top  = p.y.toFixed(1) + 'px';
+    // Preserve the centering translate that lives in the base CSS.
+    this.sun.style.transform = `translate(-50%,-50%) scale(${s.sunScale.toFixed(3)})`;
+    this.sun.style.filter =
+      `brightness(${s.sunBrightness.toFixed(3)}) ` +
+      `drop-shadow(0 0 ${s.sunGlowPx.toFixed(1)}px rgba(255,213,79,${s.sunGlowAlpha.toFixed(3)}))`;
     this.sun.classList.remove('hidden');
     this.stars.style.opacity = s.starsOpacity;
   }
