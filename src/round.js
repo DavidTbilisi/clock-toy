@@ -4,11 +4,18 @@
 // Strategy pattern: every "what does mode X do?" question is answered by the
 // mode object itself (MODES[store.MODE]), not by an if/else chain here.
 
-import { DIFFICULTIES, ROUNDS_PER_SESSION } from './config.js';
+import { DIFFICULTIES, ROUNDS_PER_SESSION, PROMOTE, PASS, FALLBACK } from './config.js';
 import { MODES } from './modes/index.js';
 
+const ERROR_AUDIO_KEY = {
+  'hour hand':     'wrong-hour-hand',
+  'minute hand':   'wrong-minute-hand',
+  'hour slider':   'wrong-hour-slider',
+  'minute slider': 'wrong-minute-slider',
+};
+
 export class RoundRunner {
-  constructor({ store, clock, sliders, sky, stats, feedback, summary }) {
+  constructor({ store, clock, sliders, sky, stats, feedback, summary, audio }) {
     this.store = store;
     this.clock = clock;
     this.sliders = sliders;
@@ -16,6 +23,7 @@ export class RoundRunner {
     this.stats = stats;
     this.feedback = feedback;
     this.summary = summary;
+    this.audio = audio;
     this._tInterval = null;
   }
 
@@ -100,6 +108,11 @@ export class RoundRunner {
     }
 
     this.feedback.showAnswer({ ok, timeout: false, round: ROUND, errors });
+
+    if (this.audio) {
+      if (ok) this.audio.play('correct');
+      else    this.audio.play(ERROR_AUDIO_KEY[errors[0]] || 'wrong-hour-hand');
+    }
   }
 
   onTimeout() {
@@ -112,6 +125,7 @@ export class RoundRunner {
     this.stats.updateAccuracyAndLatency();
     this.feedback.showAnswer({ ok: false, timeout: true, round: this.store.ROUND, errors: [] });
     this.feedback.setNextMode();
+    if (this.audio) this.audio.play('timeout');
   }
 
   nextRound() {
@@ -139,6 +153,7 @@ export class RoundRunner {
   showHint() {
     if (!this._mode().showsHint) return;
     this.feedback.showHint();
+    if (this.audio) this.audio.play('hint');
   }
 
   // ── Restart paths ──────────────────────────────────────────
@@ -189,5 +204,20 @@ export class RoundRunner {
   _showSummary() {
     this._stopTimer();
     this.summary.show();
+
+    if (!this.audio) return;
+    // Speak the verdict that matches the result (mirrors summary.js logic).
+    const { results, DIFF } = this.store;
+    const n = results.length;
+    const c = results.filter((r) => r.correct).length;
+    const acc = c / n;
+    const avgLat = results.reduce((s, r) => s + r.latency, 0) / n;
+    const plateau = DIFFICULTIES[DIFF].plateau;
+    let verdictKey;
+    if (acc >= PROMOTE && avgLat <= plateau) verdictKey = 'verdict-promote';
+    else if (acc >= PASS)                    verdictKey = 'verdict-pass';
+    else if (acc >= FALLBACK)                verdictKey = 'verdict-keep-going';
+    else                                     verdictKey = 'verdict-try-easy';
+    this.audio.play(verdictKey);
   }
 }

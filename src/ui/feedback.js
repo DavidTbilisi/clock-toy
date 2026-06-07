@@ -1,9 +1,19 @@
 // Feedback panel + check/next/hint button visibility.
 // Pure DOM mutator — game logic decides what to show, this just renders it.
+// Last-shown state is cached so refresh() can re-render in a new locale.
 
 import { formatTime, periodIcon } from '../modes/base.js';
+import { t } from '../i18n/index.js';
 
-function nicePartOfDay(h24) {
+const ERROR_KEY = {
+  'hour hand':     'hourHand',
+  'minute hand':   'minuteHand',
+  'hour slider':   'hourSlider',
+  'minute slider': 'minuteSlider',
+  'ran out of time': 'ranOutOfTime',
+};
+
+function partOfDayKey(h24) {
   if (h24 >= 5  && h24 < 12) return 'morning';
   if (h24 >= 12 && h24 < 17) return 'afternoon';
   if (h24 >= 17 && h24 < 20) return 'evening';
@@ -13,40 +23,65 @@ function nicePartOfDay(h24) {
 export class FeedbackView {
   constructor({ els }) {
     this.els = els;
+    /** @type {null | {kind:'answer', args:object} | {kind:'hint'}} */
+    this._last = null;
   }
 
   hide() {
     this.els.fb.style.display = 'none';
+    this._last = null;
   }
 
   showAnswer({ ok, timeout, round, errors }) {
+    this._last = { kind: 'answer', args: { ok, timeout, round, errors } };
+    this._renderAnswer({ ok, timeout, round, errors });
+  }
+
+  showHint() {
+    this._last = { kind: 'hint' };
+    this._renderHint();
+  }
+
+  // Re-render the current panel content in the latest locale.
+  refresh() {
+    if (!this._last) return;
+    if (this._last.kind === 'answer') this._renderAnswer(this._last.args);
+    else if (this._last.kind === 'hint') this._renderHint();
+  }
+
+  _renderAnswer({ ok, timeout, round, errors }) {
     const fb = this.els.fb;
     fb.style.display = 'block';
     fb.className = ok ? 'ok' : 'bad';
 
+    const time = formatTime(round);
     let title, body;
     if (timeout) {
-      title = `⏱ Time's up! The time was ${formatTime(round)}.`;
-      body  = `Try to read the clock a little quicker next round.`;
+      title = t('feedback.timeoutTitle', { time });
+      body  = t('feedback.timeoutBody');
     } else if (ok) {
-      title = `✓ ${formatTime(round)} — exactly right!`;
-      body  = `That's ${formatTime(round)} in the ${nicePartOfDay(round.hour24)}. ${periodIcon(round)}`;
+      title = t('feedback.correctTitle', { time });
+      body  = t('feedback.correctBody', {
+        time,
+        partOfDay: t(`parts.${partOfDayKey(round.hour24)}`),
+        icon: periodIcon(round),
+      });
     } else {
-      title = `Almost! Check the ${errors[0]}.`;
-      body  = `Target was <b>${formatTime(round)}</b> (hour ${round.hour}, minute ${round.minute}).`;
-      if (errors.length > 1) body += ` (${errors.length} parts to fix)`;
+      const errKey = ERROR_KEY[errors[0]] || 'hourHand';
+      title = t('feedback.wrongTitle', { error: t(`errors.${errKey}`) });
+      body  = t('feedback.wrongBody', { time, hour: round.hour, minute: round.minute });
+      if (errors.length > 1) body += t('feedback.moreErrors', { n: errors.length });
     }
     fb.innerHTML = `<div class="fv">${title}</div><div>${body}</div>`;
   }
 
-  showHint() {
+  _renderHint() {
     const fb = this.els.fb;
     fb.className = 'hint';
     fb.style.display = 'block';
     fb.innerHTML =
-      `<div class="fv">💡 Reading the minute hand</div>
-       <div>The <b style="color:var(--hand-m)">blue hand</b> always points at a tick on the outer ring.<br>
-       The little number (5, 10, 15… 60) at that tick is the minute — <b>not</b> the big hour bubble underneath.</div>`;
+      `<div class="fv">${t('feedback.hintTitle')}</div>` +
+      `<div>${t('feedback.hintBody')}</div>`;
   }
 
   setCheckMode() {

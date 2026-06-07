@@ -27,6 +27,16 @@ The four-position dot row above the clock tracks accuracy across a 10-round sess
 |---------------|-----------------|
 | ![](screenshots/05-drill1.png) | ![](screenshots/06-summary.png) |
 
+## Languages + voice
+
+UI ships in three locales — **English**, **ქართული** (Georgian), **Русский** (Russian) — swappable from the `EN` / `KA` / `RU` pill in the header. The choice persists in `localStorage`.
+
+| English | ქართული | Русский |
+|---------|---------|---------|
+| ![](screenshots/01-modes.png) | ![](screenshots/01-modes-ka.png) | ![](screenshots/01-modes-ru.png) |
+
+The `🔊` pill toggles voice on/off. When on, the toy speaks the result of each check, the timeout, the drill 2 hint, and the end-of-session verdict in the active language. Audio clips were pre-generated with a local TTS tool (Azure Neural voices for ka/ru/en) and live as static MP3s under `audio/<lang>/`. **No network call at runtime**, no API key, no autoplay surprises — if a clip is missing the game silently no-ops.
+
 ## Run it locally
 
 ES-modules need HTTP, so opening `index.html` from disk won't work — use any static server:
@@ -74,6 +84,8 @@ src/
   modes/           Strategy: free / drill1 / drill2 / drill3
   round.js         RoundRunner: round lifecycle + timer
   ui/              pickers, feedback, stats, summary
+  i18n/            en.js / ka.js / ru.js + t() helper + EventEmitter
+  audio.js         Pre-generated MP3 playback, locale-aware
   main.js          Composition root: instantiate modules, wire events
 ```
 

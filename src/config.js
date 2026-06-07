@@ -5,10 +5,11 @@ export const STORAGE_KEY = 'clock-toy-gym';
 export const ROUNDS_PER_SESSION = 10;
 export const HISTORY_CAP = 20;
 
+// Names and descriptions live in src/i18n/*.js under `difficulties.<key>`.
 export const DIFFICULTIES = {
-  easy:   { name: 'Easy',   icon: '🌱', desc: 'Half-hour times only',    timer: 25, plateau: 14000, minuteStep: 30, hourDrift: false },
-  medium: { name: 'Medium', icon: '🌿', desc: 'Every 5 minutes',         timer: 15, plateau:  9000, minuteStep:  5, hourDrift: false },
-  hard:   { name: 'Hard',   icon: '🌳', desc: 'Any minute, hour drifts', timer: 10, plateau:  6000, minuteStep:  1, hourDrift: true  },
+  easy:   { key: 'easy',   icon: '🌱', timer: 25, plateau: 14000, minuteStep: 30, hourDrift: false },
+  medium: { key: 'medium', icon: '🌿', timer: 15, plateau:  9000, minuteStep:  5, hourDrift: false },
+  hard:   { key: 'hard',   icon: '🌳', timer: 10, plateau:  6000, minuteStep:  1, hourDrift: true  },
 };
 
 // Verdict thresholds for the summary screen.

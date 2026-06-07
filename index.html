@@ -117,6 +117,37 @@ body{
   letter-spacing:.04em;
   text-transform:uppercase;
 }
+.locale-toggle{
+  font-family:'Fraunces',serif;
+  font-weight:900;
+  font-size:.78rem;
+  letter-spacing:.06em;
+  background:var(--hand-m);
+  color:var(--face);
+  border:1.5px solid #1a3450;
+  padding:6px 11px;
+  border-radius:999px;
+  cursor:pointer;
+  box-shadow:0 2px 0 #1a3450;
+  transition:transform .08s ease,box-shadow .08s ease;
+  user-select:none;
+  min-width:42px;
+}
+.locale-toggle:active{transform:translateY(1px);box-shadow:0 1px 0 #1a3450}
+.voice-toggle{
+  font-size:.95rem;
+  background:var(--face);
+  color:var(--ink);
+  border:1.5px solid var(--board-edge);
+  padding:6px 9px;
+  border-radius:999px;
+  cursor:pointer;
+  box-shadow:0 2px 0 var(--board-edge);
+  transition:transform .08s ease,box-shadow .08s ease;
+  user-select:none;
+  line-height:1;
+}
+.voice-toggle:active{transform:translateY(1px);box-shadow:0 1px 0 var(--board-edge)}
 
 /* ── Selection screens ────────────────────────────────────── */
 .sel-block{
@@ -511,20 +542,22 @@ body{
 <div class="board">
 
   <div class="hdr">
-    <div class="back-btn"><a href="index.html">← Gyms</a></div>
-    <div class="gym-title">⏰ Clock Toy</div>
-    <div class="mode-pill" id="mode-pill">Choose Mode</div>
+    <div class="back-btn"><a href="index.html" data-i18n="app.back">← Gyms</a></div>
+    <div class="gym-title">⏰ <span data-i18n="app.title">Clock Toy</span></div>
+    <button id="locale-toggle" class="locale-toggle" type="button" aria-label="Language">EN</button>
+    <button id="voice-toggle" class="voice-toggle" type="button" aria-label="Voice">🔊</button>
+    <div class="mode-pill" id="mode-pill" data-i18n="app.chooseMode">Choose Mode</div>
   </div>
 
   <div id="mode-sel" class="sel-block">
-    <div class="sel-title">Pick a mode</div>
+    <div class="sel-title" data-i18n="picker.pickMode">Pick a mode</div>
     <div class="sel-grid" id="mode-grid"></div>
   </div>
 
   <div id="diff-sel" class="sel-block" hidden>
-    <div class="sel-title">Pick a difficulty</div>
+    <div class="sel-title" data-i18n="picker.pickDifficulty">Pick a difficulty</div>
     <div class="sel-grid" id="diff-grid"></div>
-    <button class="restart-btn" style="margin-top:14px">↩ Back to modes</button>
+    <button class="restart-btn" style="margin-top:14px" data-i18n="picker.backToModes">↩ Back to modes</button>
   </div>
 
   <div id="play" hidden>
@@ -534,15 +567,15 @@ body{
     <div id="stats-row">
       <div class="ring-wrap">
         <svg viewBox="0 0 70 70"><circle class="r-bg" cx="35" cy="35" r="27"/><circle class="r-fill" id="r-fill" cx="35" cy="35" r="27"/></svg>
-        <div class="ring-label"><div class="r-pct" id="r-pct">—</div><div class="r-sub">correct</div></div>
+        <div class="ring-label"><div class="r-pct" id="r-pct">—</div><div class="r-sub" data-i18n="stats.correct">correct</div></div>
       </div>
       <div class="stats-right">
         <div class="stat-block">
-          <div class="stat-lbl">time per round <span id="lat-txt">—</span></div>
+          <div class="stat-lbl"><span data-i18n="stats.timePerRound">time per round</span> <span id="lat-txt">—</span></div>
           <div class="bar-wrap"><div class="bar-fill" id="lat-bar" style="width:0%"></div></div>
         </div>
         <div class="streak-row">
-          <div class="streak-label">streak</div>
+          <div class="streak-label" data-i18n="stats.streak">streak</div>
           <div class="sdots" id="sdots"></div>
         </div>
       </div>
@@ -550,14 +583,14 @@ body{
 
     <div class="dice-area">
       <div class="dice" id="dice"><div class="dice-time">?</div><div class="dice-period">roll!</div></div>
-      <button id="roll-btn">🎲 Roll!</button>
+      <button id="roll-btn" data-i18n="buttons.roll">🎲 Roll!</button>
       <div class="target-display" id="target-display">—</div>
     </div>
 
     <div class="action-row">
-      <button id="hint-btn" style="display:none">💡 Hint</button>
-      <button id="check-btn">✓ Check!</button>
-      <button id="next-btn">Next →</button>
+      <button id="hint-btn" style="display:none" data-i18n="buttons.hint">💡 Hint</button>
+      <button id="check-btn" data-i18n="buttons.check">✓ Check!</button>
+      <button id="next-btn" data-i18n="buttons.next">Next →</button>
     </div>
     <div id="fb"></div>
 
@@ -567,12 +600,12 @@ body{
 
     <div class="sliders">
       <div class="rail" id="hour-rail">
-        <span class="rail-label">HOUR</span>
+        <span class="rail-label" data-i18n="rails.hour">HOUR</span>
         <div class="rail-ticks" id="hour-ticks"></div>
         <div class="knob hour-knob" id="hour-knob">12</div>
       </div>
       <div class="rail" id="minute-rail">
-        <span class="rail-label">MINUTE</span>
+        <span class="rail-label" data-i18n="rails.minute">MINUTE</span>
         <div class="rail-ticks" id="minute-ticks"></div>
         <div class="knob minute-knob" id="minute-knob">0</div>
       </div>

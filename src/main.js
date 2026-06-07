@@ -11,6 +11,9 @@ import { FeedbackView } from './ui/feedback.js';
 import { Pickers } from './ui/pickers.js';
 import { SummaryView } from './ui/summary.js';
 import { RoundRunner } from './round.js';
+import { i18n, t, SUPPORTED as LOCALES } from './i18n/index.js';
+import { MODES } from './modes/index.js';
+import { AudioPlayer } from './audio.js';
 
 const $ = (id) => document.getElementById(id);
 
@@ -57,6 +60,8 @@ const els = {
   nextBtn:        $('next-btn'),
   fb:             $('fb'),
 
+  localeToggle:   $('locale-toggle'),
+  voiceToggle:    $('voice-toggle'),
 };
 
 // ── Module instances ────────────────────────────────────────
@@ -76,7 +81,8 @@ const summary = new SummaryView({
   onRestartSame: () => runner.restartSame(els),
   onChooseMode: () => pickers.resetToModes(),
 });
-const runner = new RoundRunner({ store, clock, sliders, sky, stats, feedback, summary });
+const audio = new AudioPlayer({ locale: i18n.locale });
+const runner = new RoundRunner({ store, clock, sliders, sky, stats, feedback, summary, audio });
 const pickers = new Pickers({
   store, els,
   onStartSession: () => runner.startSession(),
@@ -123,6 +129,38 @@ els.hintBtn.addEventListener('click', () => runner.showHint());
 els.checkBtn.addEventListener('click', () => runner.checkAnswer());
 els.nextBtn.addEventListener('click', () => runner.nextRound());
 els.backToModes.addEventListener('click', () => pickers.resetToModes());
+els.localeToggle.addEventListener('click', () => i18n.cycleLocale());
+els.voiceToggle.addEventListener('click', () => { audio.toggle(); refreshVoiceToggle(); });
+
+function refreshVoiceToggle() {
+  els.voiceToggle.textContent = audio.isEnabled() ? '🔊' : '🔇';
+  els.voiceToggle.setAttribute('aria-pressed', String(audio.isEnabled()));
+}
+refreshVoiceToggle();
+
+// ── i18n ────────────────────────────────────────────────────
+// Update every element marked with data-i18n="dotted.key", refresh dynamic
+// components that own their own DOM, and reflect the current locale on the
+// header toggle. Runs at boot and on every locale:change.
+function applyLocale() {
+  document.documentElement.lang = i18n.locale;
+  document.querySelectorAll('[data-i18n]').forEach((el) => {
+    el.textContent = t(el.getAttribute('data-i18n'));
+  });
+  els.localeToggle.textContent = i18n.locale.toUpperCase();
+  pickers.refresh();
+  feedback.refresh();
+  summary.refresh();
+  // The target display is dynamic per-round; refresh it from the active mode.
+  if (store.MODE && store.ROUND) {
+    const m = MODES[store.MODE];
+    if (m) stats.setTargetText(m.targetText(store.ROUND));
+  }
+}
+i18n.on('locale:change', (code) => {
+  audio.setLocale(code);
+  applyLocale();
+});
 
 window.addEventListener('resize', () => {
   sliders.render('hour');
@@ -143,6 +181,7 @@ pickers.build();
 sky.build();
 clock.build();
 sliders.build();
+applyLocale();  // initial pass so static `[data-i18n]` text reflects the loaded locale
 
 // ── Test/debug surface ──────────────────────────────────────
 // Keeps the existing Playwright suite green without test changes.
@@ -164,4 +203,7 @@ window.__clock = {
   setHandM:   (m) => store.setHandM(m),
   setSliderH: (h) => store.setSliderH(h),
   setSliderM: (m) => store.setSliderM(m),
+  locale:     () => i18n.locale,
+  setLocale:  (c) => i18n.setLocale(c),
+  cycleLocale: () => i18n.cycleLocale(),
 };

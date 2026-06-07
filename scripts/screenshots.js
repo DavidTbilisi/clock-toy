@@ -41,11 +41,24 @@ async function shot(page, file, label) {
   const page = await ctx.newPage();
   const baseURL = `http://127.0.0.1:${PORT}/index.html`;
 
-  // ── 01 — Mode picker (entry screen) ───────────────────────
+  // ── 01 — Mode picker (entry screen, English) ──────────────
   await page.goto(baseURL);
   await page.addStyleTag({ content: FREEZE_TRANSITIONS });
+  await page.evaluate(() => { localStorage.removeItem('clock-toy-locale'); window.__clock.setLocale('en'); });
   await page.waitForTimeout(150);
-  await shot(page, '01-modes.png', 'mode picker');
+  await shot(page, '01-modes.png', 'mode picker (EN)');
+
+  // ── 1a/1b — Same screen, in ka and ru ─────────────────────
+  await page.evaluate(() => window.__clock.setLocale('ka'));
+  await page.waitForTimeout(150);
+  await shot(page, '01-modes-ka.png', 'mode picker (KA)');
+
+  await page.evaluate(() => window.__clock.setLocale('ru'));
+  await page.waitForTimeout(150);
+  await shot(page, '01-modes-ru.png', 'mode picker (RU)');
+
+  await page.evaluate(() => window.__clock.setLocale('en'));
+  await page.waitForTimeout(100);
 
   // ── 02 — Free Play at noon (bright midday sun) ────────────
   await page.evaluate(() => { pickMode('free'); pickDifficulty('easy'); });

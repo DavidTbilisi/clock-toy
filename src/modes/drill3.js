@@ -1,8 +1,8 @@
+import { t } from '../i18n/index.js';
+
 export const Drill3Mode = {
   key: 'drill3',
-  name: 'Build from Sliders',
   icon: '🔧',
-  desc: 'Sliders are set. Place the hands to match.',
   timed: true,
   showsHint: false,
   showsDice: false,
@@ -15,6 +15,6 @@ export const Drill3Mode = {
   },
 
   targetText() {
-    return 'Match the sliders!';
+    return t('prompts.matchTheSliders');
   },
 };

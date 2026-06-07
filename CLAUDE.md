@@ -72,6 +72,16 @@ The DOM is fixed in HTML; JS only fills inner content and toggles visibility/loc
 - CSS uses custom properties at `:root` for the palette. Re-use those tokens rather than hardcoding colors.
 - No comments narrating "what" the code does — only non-obvious "why" (e.g. the sun-arc geometry, tick-label hint, the `:not([hidden])` workaround).
 
+## i18n + voice
+
+Three locales (`en`, `ka`, `ru`) live in `src/i18n/*.js`. English is the master — every other locale mirrors its key set. The picker module, feedback view, summary view, mode/difficulty pill, rail labels, and every static button label flow through `t('dotted.key', { ...params })`. Static DOM text uses `data-i18n="key"` and is refreshed wholesale on every `locale:change` event.
+
+The locale defaults to `localStorage['clock-toy-locale']`, falling back to `navigator.language` prefix-match, falling back to `en`. The `EN/KA/RU` pill in the header cycles through `SUPPORTED` and persists the choice.
+
+Audio clips live under `audio/<locale>/<key>.mp3` and are played by `src/audio.js`. Twelve fixed phrases per language are baked in: `correct`, `wrong-{hour,minute}-{hand,slider}`, `timeout`, `hint`, `verdict-{promote,pass,keep-going,try-easy}`, `session-complete`. The runtime path is HTMLAudioElement only — no Azure SDK, no network. Missing clips silently no-op. The `🔊` toggle in the header writes `clock-toy-voice=0|1` to localStorage. Default ON.
+
+To regenerate the audio assets, drive the local tts-ka MCP at dev time: each `speak()` call writes its rendered MP3 to a tempfile, whose path appears in the call result. Copy it to `audio/<locale>/<key>.mp3` before the next call (the path is overwritten per session). Don't ship the generation step in the repo — the assets are checked in.
+
 ## Testing
 
 Playwright e2e suite under `tests/`. Three spec files:
