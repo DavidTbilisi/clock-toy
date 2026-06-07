@@ -75,24 +75,46 @@ export class Store extends EventEmitter {
   }
 
   // ── Hand/slider state ───────────────────────────────────────
+  // The four setters are paired: moving a hand drives the matching slider
+  // (and vice-versa) so the two controls always show the same time. Locks
+  // are respected, so drill2 (hands locked) and drill3 (sliders locked)
+  // keep their pre-filled side intact when the player drives the other.
+  // No recursion: each setter emits its own event after mirroring, but
+  // never calls a peer setter — observers handle the resulting render.
   setHandH(h) {
     this.STATE.handH = h;
     this.emit('hands:change', this.STATE.handH, this.STATE.handM);
+    if (!this.STATE.locked.sliderH && this.STATE.sliderH !== h) {
+      this.STATE.sliderH = h;
+      this.emit('sliders:change', this.STATE.sliderH, this.STATE.sliderM);
+    }
   }
 
   setHandM(m) {
     this.STATE.handM = m;
     this.emit('hands:change', this.STATE.handH, this.STATE.handM);
+    if (!this.STATE.locked.sliderM && this.STATE.sliderM !== m) {
+      this.STATE.sliderM = m;
+      this.emit('sliders:change', this.STATE.sliderH, this.STATE.sliderM);
+    }
   }
 
   setSliderH(h) {
     this.STATE.sliderH = h;
     this.emit('sliders:change', this.STATE.sliderH, this.STATE.sliderM);
+    if (!this.STATE.locked.handH && this.STATE.handH !== h) {
+      this.STATE.handH = h;
+      this.emit('hands:change', this.STATE.handH, this.STATE.handM);
+    }
   }
 
   setSliderM(m) {
     this.STATE.sliderM = m;
     this.emit('sliders:change', this.STATE.sliderH, this.STATE.sliderM);
+    if (!this.STATE.locked.handM && this.STATE.handM !== m) {
+      this.STATE.handM = m;
+      this.emit('hands:change', this.STATE.handH, this.STATE.handM);
+    }
   }
 
   // ── Session lifecycle ───────────────────────────────────────

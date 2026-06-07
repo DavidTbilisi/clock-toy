@@ -159,6 +159,9 @@ window.__clock = {
   period: () => store.period,
   freePlayHour24: () => store.freePlayHour24(),
   applySky: (h, m) => sky.apply(h, m),
-  // Drive the store through its real setter so observers fire (used by tests).
-  setHandH: (h) => store.setHandH(h),
+  // Drive the store through its real setters so observers fire (used by tests).
+  setHandH:   (h) => store.setHandH(h),
+  setHandM:   (m) => store.setHandM(m),
+  setSliderH: (h) => store.setSliderH(h),
+  setSliderM: (m) => store.setSliderM(m),
 };
