@@ -256,6 +256,41 @@ test.describe('sky transition 11:00 → 12:00 (noon)', () => {
     ]);
   });
 
+  test('sun walks a full circle: noon→top, 6 PM→right, midnight→bottom, 6 AM→left', async ({ page }) => {
+    // Probe the four cardinal hours and check the sun lands in the expected
+    // quadrant of the orbit relative to viewport center. Tolerance is loose
+    // (within 5 px of the principal axis, ≥ 100 px off the orthogonal one)
+    // because the exact radius depends on viewport dimensions.
+    const positions = await page.evaluate(() => {
+      const cx = window.innerWidth / 2;
+      const cy = window.innerHeight / 2;
+      const probe = (h) => {
+        window.__clock.applySky(h, 0);
+        const sun = document.getElementById('sun');
+        return { h, x: parseFloat(sun.style.left), y: parseFloat(sun.style.top) };
+      };
+      return [12, 18, 0, 6].map((h) => ({ ...probe(h), cx, cy }));
+    });
+
+    const [noon, sixPm, midnight, sixAm] = positions;
+
+    // Noon: top of circle (x at center, y well above).
+    expect(Math.abs(noon.x - noon.cx)).toBeLessThan(5);
+    expect(noon.y).toBeLessThan(noon.cy - 100);
+
+    // 6 PM: right side (x well to the right, y at center).
+    expect(sixPm.x).toBeGreaterThan(sixPm.cx + 100);
+    expect(Math.abs(sixPm.y - sixPm.cy)).toBeLessThan(5);
+
+    // Midnight: bottom of circle (x at center, y well below).
+    expect(Math.abs(midnight.x - midnight.cx)).toBeLessThan(5);
+    expect(midnight.y).toBeGreaterThan(midnight.cy + 100);
+
+    // 6 AM: left side (x well to the left, y at center).
+    expect(sixAm.x).toBeLessThan(sixAm.cx - 100);
+    expect(Math.abs(sixAm.y - sixAm.cy)).toBeLessThan(5);
+  });
+
   test('sun arc position moves left-to-right between 11:00 and 12:00', async ({ page }) => {
     // arcCoords: angle = (t/24) * 180. From t=11 (angle 82.5°) to t=12 (angle 90°)
     // the sun should move slightly to the right along the half-ellipse.

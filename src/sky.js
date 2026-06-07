@@ -31,7 +31,9 @@ export function skyForTime(h24, m) {
   const f = b.h === a.h ? 0 : (t - a.h) / (b.h - a.h);
   const top = lerp(a.top, b.top, f);
   const bot = lerp(a.bot, b.bot, f);
-  const sunAngle = (t / 24) * 180;
+  // Full 24-hour orbit measured clockwise from the top of the circle:
+  //   0° = noon (top), 90° = 6 PM (right), 180° = midnight (bottom), 270° = 6 AM (left).
+  const sunAngle = ((t - 12) / 24) * 360;
 
   // dayFactor: 0 at midnight, peaks at 1 at solar noon, 0 again at next midnight.
   // Drives sun size + glow so the sun grows huge and shines bright at midday.
@@ -58,16 +60,17 @@ export function skyForTime(h24, m) {
   };
 }
 
-// Half-ellipse over the top sky strip: wide horizontal, narrow vertical
-// so noon peaks high and dawn/dusk land at the sides.
+// Real circle centered on the viewport. `angle` is degrees clockwise from
+// the top: 0° = top, 90° = right, 180° = bottom, 270° = left. The sun walks
+// the full circumference once per day, dipping behind the board at midnight.
 function arcCoords(angle) {
   const vw = window.innerWidth;
+  const vh = window.innerHeight;
   const cx = vw / 2;
-  const cy = 130;
-  const a = Math.max(160, vw / 2 - 40);
-  const b = 110;
-  const r = (180 - angle) * Math.PI / 180;
-  return { x: cx + a * Math.cos(r), y: cy - b * Math.sin(r) };
+  const cy = vh / 2;
+  const radius = Math.max(180, Math.min(vw, vh) * 0.4);
+  const r = angle * Math.PI / 180;
+  return { x: cx + radius * Math.sin(r), y: cy - radius * Math.cos(r) };
 }
 
 export class Sky {
