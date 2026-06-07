@@ -554,14 +554,17 @@ body{
   #stats-row{padding:12px 16px}
   .ring-wrap,.ring-wrap svg{width:68px;height:68px}
   .r-pct{font-size:1.15rem}
-  .dice-area{padding:12px 14px;gap:12px}
-  .dice{width:74px;height:74px}
-  .dice-time{font-size:1.05rem}
-  #roll-btn{padding:13px;font-size:.94rem;min-height:54px}
-  .target-display{font-size:.9rem;padding:8px 12px;min-width:78px}
-  #check-btn,#next-btn{padding:13px;font-size:1rem;min-height:54px}
-  #hint-btn{padding:13px 18px;font-size:.9rem;min-height:54px}
-  #fb{padding:12px 16px;font-size:.9rem}
+  .dice-area{padding:8px 10px;gap:8px}
+  .dice{width:54px;height:54px;border-radius:10px}
+  .dice-time{font-size:.9rem}
+  .dice-period{font-size:.55rem;margin-top:1px}
+  #roll-btn{padding:10px 12px;font-size:.85rem;min-height:44px;box-shadow:0 3px 0 #1a3450,0 4px 8px rgba(45,74,107,.2)}
+  .target-display{font-size:.85rem;padding:6px 10px;min-width:64px}
+  .action-row{gap:8px}
+  #check-btn,#next-btn{padding:10px;font-size:.95rem;min-height:44px;box-shadow:0 3px 0 #3e6230,0 4px 8px rgba(93,138,71,.2)}
+  #next-btn{box-shadow:0 3px 0 #1a3450,0 4px 8px rgba(45,74,107,.2)}
+  #hint-btn{padding:10px 14px;font-size:.82rem;min-height:44px}
+  #fb{padding:9px 12px;font-size:.85rem}
 }
 
 /* ── Mobile ───────────────────────────────────────────────── */
@@ -673,6 +676,9 @@ body{
         </div>
       </div>
 
+    </div>
+
+    <div class="play-right">
       <div class="dice-area">
         <div class="dice" id="dice"><div class="dice-time">?</div><div class="dice-period">roll!</div></div>
         <button id="roll-btn" data-i18n="buttons.roll">🎲 Roll!</button>
@@ -685,9 +691,7 @@ body{
         <button id="next-btn" data-i18n="buttons.next">Next →</button>
       </div>
       <div id="fb"></div>
-    </div>
 
-    <div class="play-right">
       <div class="clock-wrap">
         <svg id="clock" viewBox="0 0 400 400"></svg>
       </div>
