@@ -1,9 +1,9 @@
-﻿<!DOCTYPE html>
+<!DOCTYPE html>
 <html lang="en">
 <head>
 <meta charset="UTF-8">
 <meta name="viewport" content="width=device-width, initial-scale=1.0, user-scalable=no">
-<title>Clock Toy Gym â€” Neural OS</title>
+<title>Clock Toy Gym — Neural OS</title>
 <link rel="preconnect" href="https://fonts.googleapis.com">
 <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
 <link href="https://fonts.googleapis.com/css2?family=Fraunces:opsz,wght@9..144,600;9..144,800;9..144,900&family=Quicksand:wght@500;600;700&display=swap" rel="stylesheet">
@@ -15,7 +15,7 @@
   --ink:#2a2018;
   --muted:#7a6a55;
 
-  /* Board â€” terracotta on cream */
+  /* Board — terracotta on cream */
   --board:#d4814c;
   --board-edge:#7a3a1e;
   --board-shadow:rgba(60,28,14,.28);
@@ -57,7 +57,7 @@ body{
   min-height:100vh;
 }
 
-/* â”€â”€ Sky layer â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€ */
+/* ── Sky layer ─────────────────────────────────────────────── */
 .sky{position:fixed;inset:0;z-index:0;pointer-events:none;overflow:hidden}
 .stars-svg{position:absolute;width:100%;height:100%;display:block}
 .celestial-body{
@@ -73,7 +73,7 @@ body{
 #stars{transition:opacity .8s ease}
 @keyframes twinkle{0%{opacity:.3}100%{opacity:1}}
 
-/* â”€â”€ Board â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€ */
+/* ── Board ─────────────────────────────────────────────────── */
 .board{
   position:relative;z-index:1;
   max-width:580px;margin:0 auto;
@@ -115,7 +115,7 @@ body{
   text-transform:uppercase;
 }
 
-/* â”€â”€ Selection screens â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€ */
+/* ── Selection screens ────────────────────────────────────── */
 .sel-block{
   background:var(--board);
   border:2px solid var(--board-edge);
@@ -153,7 +153,7 @@ body{
 .sel-desc{font-size:.72rem;color:var(--muted);line-height:1.4;font-weight:500}
 .sel-desc b{color:var(--ink);font-weight:700}
 
-/* â”€â”€ Stats row â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€ */
+/* ── Stats row ────────────────────────────────────────────── */
 #stats-row{
   display:flex;gap:18px;
   background:var(--board);
@@ -181,7 +181,7 @@ body{
 .sdot{width:11px;height:11px;border-radius:50%;background:rgba(42,32,24,.25);transition:background .25s,transform .25s}
 .sdot.lit{background:var(--face);transform:scale(1.2);box-shadow:0 0 0 2px rgba(250,243,223,.3)}
 
-/* â”€â”€ Progress + timer â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€ */
+/* ── Progress + timer ─────────────────────────────────────── */
 #prog-track{display:flex;gap:4px;padding:0 6px}
 .pd{flex:1;height:5px;border-radius:3px;background:rgba(42,32,24,.18);transition:background .2s}
 .pd.done-ok{background:var(--ok)}
@@ -190,7 +190,7 @@ body{
 #timer-wrap{height:10px;background:rgba(42,32,24,.18);border-radius:5px;overflow:hidden;margin:0 6px;border:1px solid rgba(42,32,24,.12)}
 #timer-bar{height:100%;background:var(--ok);width:100%;transition:width .1s linear,background-color .3s}
 
-/* â”€â”€ Dice area â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€ */
+/* ── Dice area ────────────────────────────────────────────── */
 .dice-area{
   display:flex;align-items:center;gap:14px;
   background:var(--board);
@@ -245,7 +245,7 @@ body{
   box-shadow:0 2px 0 var(--board-edge);
 }
 
-/* â”€â”€ Clock â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€ */
+/* ── Clock ────────────────────────────────────────────────── */
 .clock-wrap{
   background:var(--board);
   border:3px solid var(--board-edge);
@@ -270,7 +270,7 @@ body{
 [data-locked="true"]{opacity:.5;cursor:default!important;pointer-events:none}
 [data-dragging="true"]{transition:none!important;cursor:grabbing!important}
 
-/* â”€â”€ Sliders â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€ */
+/* ── Sliders ──────────────────────────────────────────────── */
 .sliders{
   background:var(--board);
   border:2px solid var(--board-edge);
@@ -331,7 +331,7 @@ body{
   border-radius:3px;
 }
 
-/* â”€â”€ Buttons + feedback â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€ */
+/* ── Buttons + feedback ───────────────────────────────────── */
 .action-row{display:flex;gap:12px}
 #check-btn{
   flex:1;background:var(--ok);color:var(--face);
@@ -375,6 +375,7 @@ body{
 #fb.hint .fv{color:#7a5a18}
 #fb b{font-weight:700;font-family:'Fraunces',serif}
 #next-btn{
+  flex:1;
   background:var(--hand-m);color:var(--face);
   border:none;border-radius:var(--r-sm);
   padding:16px;font-size:1.08rem;font-weight:700;
@@ -386,7 +387,7 @@ body{
 }
 #next-btn:active{transform:translateY(3px);box-shadow:0 1px 0 #1a3450, 0 2px 4px rgba(45,74,107,.2)}
 
-/* â”€â”€ Summary â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€ */
+/* ── Summary ──────────────────────────────────────────────── */
 #summary{
   background:var(--board);
   border:2px solid var(--board-edge);
@@ -433,33 +434,7 @@ body{
 .restart-btn:hover{background:var(--soft)}
 .restart-btn:active{transform:translateY(2px);box-shadow:0 1px 0 var(--board-edge)}
 
-/* â”€â”€ Desktop two-column layout â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€ */
-@media(min-width:960px){
-  .board{max-width:980px;padding-top:160px}
-  /* :not([hidden]) keeps display:grid from overriding the `hidden` attribute. */
-  #play:not([hidden]){
-    display:grid;
-    grid-template-columns:minmax(0,560px) minmax(280px,320px);
-    column-gap:32px;
-    row-gap:16px;
-    align-items:start;
-  }
-  #prog-track,#timer-wrap,#stats-row,.dice-area,.clock-wrap,.sliders{grid-column:1}
-  .action-row,#fb,#next-btn{grid-column:2;width:100%;align-self:start}
-  .action-row{
-    grid-row:1;
-    position:sticky;top:24px;
-    flex-direction:column;
-    z-index:5;
-  }
-  #fb{grid-row:2;position:sticky;top:130px;max-height:calc(100vh - 160px);overflow:auto;z-index:4}
-  #next-btn{grid-row:3;position:sticky;top:130px;z-index:4}
-  .action-row #check-btn,.action-row #hint-btn{width:100%}
-  /* Header and selection screens stay centered above the play grid. */
-  .hdr,#mode-sel,#diff-sel,#summary{max-width:600px;margin-left:auto;margin-right:auto;width:100%}
-}
-
-/* â”€â”€ Mobile â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€ */
+/* ── Mobile ───────────────────────────────────────────────── */
 @media(max-width:480px){
   body{font-size:15px}
   .board{padding:14px 10px 28px;padding-top:130px;gap:12px}
@@ -489,7 +464,7 @@ body{
 </head>
 <body>
 
-<!-- â”€â”€ Sky background â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€ -->
+<!-- ── Sky background ─────────────────────────────────────── -->
 <div class="sky" aria-hidden="true">
   <svg class="stars-svg" viewBox="0 0 1000 600" preserveAspectRatio="xMidYMid slice">
     <g id="stars"></g>
@@ -524,12 +499,12 @@ body{
   </div>
 </div>
 
-<!-- â”€â”€ Board (foreground) â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€ -->
+<!-- ── Board (foreground) ─────────────────────────────────── -->
 <div class="board">
 
   <div class="hdr">
-    <div class="back-btn"><a href="index.html">â† Gyms</a></div>
-    <div class="gym-title">â° Clock Toy</div>
+    <div class="back-btn"><a href="index.html">← Gyms</a></div>
+    <div class="gym-title">⏰ Clock Toy</div>
     <div class="mode-pill" id="mode-pill">Choose Mode</div>
   </div>
 
@@ -541,7 +516,7 @@ body{
   <div id="diff-sel" class="sel-block" hidden>
     <div class="sel-title">Pick a difficulty</div>
     <div class="sel-grid" id="diff-grid"></div>
-    <button class="restart-btn" style="margin-top:14px">â†© Back to modes</button>
+    <button class="restart-btn" style="margin-top:14px">↩ Back to modes</button>
   </div>
 
   <div id="play" hidden>
@@ -551,11 +526,11 @@ body{
     <div id="stats-row">
       <div class="ring-wrap">
         <svg viewBox="0 0 70 70"><circle class="r-bg" cx="35" cy="35" r="27"/><circle class="r-fill" id="r-fill" cx="35" cy="35" r="27"/></svg>
-        <div class="ring-label"><div class="r-pct" id="r-pct">â€”</div><div class="r-sub">correct</div></div>
+        <div class="ring-label"><div class="r-pct" id="r-pct">—</div><div class="r-sub">correct</div></div>
       </div>
       <div class="stats-right">
         <div class="stat-block">
-          <div class="stat-lbl">time per round <span id="lat-txt">â€”</span></div>
+          <div class="stat-lbl">time per round <span id="lat-txt">—</span></div>
           <div class="bar-wrap"><div class="bar-fill" id="lat-bar" style="width:0%"></div></div>
         </div>
         <div class="streak-row">
@@ -567,9 +542,16 @@ body{
 
     <div class="dice-area">
       <div class="dice" id="dice"><div class="dice-time">?</div><div class="dice-period">roll!</div></div>
-      <button id="roll-btn">ðŸŽ² Roll!</button>
-      <div class="target-display" id="target-display">â€”</div>
+      <button id="roll-btn">🎲 Roll!</button>
+      <div class="target-display" id="target-display">—</div>
     </div>
+
+    <div class="action-row">
+      <button id="hint-btn" style="display:none">💡 Hint</button>
+      <button id="check-btn">✓ Check!</button>
+      <button id="next-btn">Next →</button>
+    </div>
+    <div id="fb"></div>
 
     <div class="clock-wrap">
       <svg id="clock" viewBox="0 0 400 400"></svg>
@@ -587,13 +569,6 @@ body{
         <div class="knob minute-knob" id="minute-knob">0</div>
       </div>
     </div>
-
-    <div class="action-row">
-      <button id="hint-btn" style="display:none">ðŸ’¡ Hint</button>
-      <button id="check-btn">âœ“ Check!</button>
-    </div>
-    <div id="fb"></div>
-    <button id="next-btn">Next â†’</button>
   </div>
 
   <div id="summary" hidden></div>

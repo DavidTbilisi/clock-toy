@@ -61,7 +61,7 @@ The DOM is fixed in HTML; JS only fills inner content and toggles visibility/loc
 - `window.__clock` is exposed at the bottom of `src/main.js` as a debug/verification hook (`STATE`, `ROUND`, `MODE`, `DIFF`, `applySky`). `src/main.js` also re-exposes `pickMode`, `pickDifficulty`, `renderHands`, `renderSlider` on `window` for the Playwright tests. Useful when driving the page from Chrome devtools.
 - Tick labels around the outer ring read `5, 10, 15, ... 60` (not `0`) — this is intentional and the hint text in `FeedbackView.showHint` explains why. Don't change `60` → `0` without updating the hint.
 - The moon is wired up in HTML and styles but currently unused (`Sky.apply` doesn't position it — sun walks the full 24-hour arc instead). Leave the moon scaffolding in place unless explicitly redesigning the sky cycle.
-- `#play{display:grid}` in the desktop media query needs `:not([hidden])` — otherwise it overrides the `hidden` attribute. The Playwright suite catches this if it regresses.
+- Layout is a single column at all viewport widths. The DOM order is: header → progress/timer/stats (timed only) → dice/roll/target → action-row (Check + Next sit in this same flex row, but they're mutually exclusive — `#check-btn` hides when `#next-btn` shows) → feedback panel → clock → sliders.
 
 ## Conventions
 
