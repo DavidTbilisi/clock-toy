@@ -473,6 +473,95 @@ body{
 .restart-btn:hover{background:var(--soft)}
 .restart-btn:active{transform:translateY(2px);box-shadow:0 1px 0 var(--board-edge)}
 
+/* ── Play-screen column wrappers ──────────────────────────── */
+/* On mobile they vanish so the existing single-column stack is unchanged;
+   the desktop media query below promotes them to flex columns. */
+.play-left,.play-right{display:contents}
+
+/* ── Desktop ──────────────────────────────────────────────── */
+/* Two-column play layout — fits on one screen without scrolling.
+   Left column: progress/timer/stats/dice/actions/feedback (question + status).
+   Right column: clock + sliders (visualisation + input). */
+@media(min-width:900px){
+  :root{--clock-width:min(340px,40vh)}
+  body{font-size:16px}
+  .board{
+    max-width:1040px;
+    padding:64px 22px 18px;
+    gap:14px;
+    min-height:0;
+  }
+  /* Dissolve the header bar into floating HUD chips at the top corners.
+     The bar background/border vanishes; each child becomes its own pill.
+     Title is anchored center; the right cluster groups via margin-left:auto. */
+  .hdr{
+    position:fixed;
+    top:14px;left:16px;right:16px;
+    background:transparent;border:none;box-shadow:none;padding:0;
+    justify-content:flex-start;
+    align-items:center;
+    gap:10px;
+    pointer-events:none;
+    z-index:5;
+  }
+  .hdr > *{pointer-events:auto;flex:0 0 auto}
+  .back-btn{
+    background:var(--face);
+    border:1.5px solid var(--board-edge);
+    border-radius:999px;
+    padding:6px 14px;
+    box-shadow:var(--shadow-card);
+  }
+  .back-btn a{opacity:1;font-size:.85rem}
+  .gym-title{
+    position:absolute;
+    left:50%;
+    transform:translateX(-50%);
+    background:var(--face);
+    border:1.5px solid var(--board-edge);
+    border-radius:999px;
+    padding:6px 18px;
+    box-shadow:var(--shadow-card);
+    font-size:1.05rem;
+    line-height:1.2;
+  }
+  /* Push locale + voice + mode-pill into a right-anchored cluster. */
+  #locale-toggle{margin-left:auto}
+  /* Pickers laid out as a single row of 4 to keep the choose-screen above the fold. */
+  .sel-grid{grid-template-columns:repeat(4,1fr)}
+  .sel-card{min-height:118px;padding:14px 10px}
+  .sel-block{padding:20px 18px}
+
+  /* :not([hidden]) so an explicit display rule doesn't defeat the hidden attribute. */
+  #play:not([hidden]){
+    display:grid;
+    grid-template-columns:minmax(260px,1fr) var(--clock-width);
+    column-gap:26px;
+    align-items:start;
+    justify-content:center;
+  }
+  .play-left,.play-right{
+    display:flex;flex-direction:column;
+    gap:12px;
+    min-width:0;
+  }
+  .clock-wrap{margin:0;align-self:center}
+  .sliders{margin:0;padding:18px 14px 14px;gap:14px}
+  .sliders .rail{height:46px}
+  .knob{width:40px;height:40px;font-size:.95rem}
+  #stats-row{padding:12px 16px}
+  .ring-wrap,.ring-wrap svg{width:68px;height:68px}
+  .r-pct{font-size:1.15rem}
+  .dice-area{padding:12px 14px;gap:12px}
+  .dice{width:74px;height:74px}
+  .dice-time{font-size:1.05rem}
+  #roll-btn{padding:13px;font-size:.94rem;min-height:54px}
+  .target-display{font-size:.9rem;padding:8px 12px;min-width:78px}
+  #check-btn,#next-btn{padding:13px;font-size:1rem;min-height:54px}
+  #hint-btn{padding:13px 18px;font-size:.9rem;min-height:54px}
+  #fb{padding:12px 16px;font-size:.9rem}
+}
+
 /* ── Mobile ───────────────────────────────────────────────── */
 @media(max-width:480px){
   body{font-size:15px}
@@ -561,53 +650,57 @@ body{
   </div>
 
   <div id="play" hidden>
-    <div id="prog-track"></div>
-    <div id="timer-wrap"><div id="timer-bar"></div></div>
+    <div class="play-left">
+      <div id="prog-track"></div>
+      <div id="timer-wrap"><div id="timer-bar"></div></div>
 
-    <div id="stats-row">
-      <div class="ring-wrap">
-        <svg viewBox="0 0 70 70"><circle class="r-bg" cx="35" cy="35" r="27"/><circle class="r-fill" id="r-fill" cx="35" cy="35" r="27"/></svg>
-        <div class="ring-label"><div class="r-pct" id="r-pct">—</div><div class="r-sub" data-i18n="stats.correct">correct</div></div>
-      </div>
-      <div class="stats-right">
-        <div class="stat-block">
-          <div class="stat-lbl"><span data-i18n="stats.timePerRound">time per round</span> <span id="lat-txt">—</span></div>
-          <div class="bar-wrap"><div class="bar-fill" id="lat-bar" style="width:0%"></div></div>
+      <div id="stats-row">
+        <div class="ring-wrap">
+          <svg viewBox="0 0 70 70"><circle class="r-bg" cx="35" cy="35" r="27"/><circle class="r-fill" id="r-fill" cx="35" cy="35" r="27"/></svg>
+          <div class="ring-label"><div class="r-pct" id="r-pct">—</div><div class="r-sub" data-i18n="stats.correct">correct</div></div>
         </div>
-        <div class="streak-row">
-          <div class="streak-label" data-i18n="stats.streak">streak</div>
-          <div class="sdots" id="sdots"></div>
+        <div class="stats-right">
+          <div class="stat-block">
+            <div class="stat-lbl"><span data-i18n="stats.timePerRound">time per round</span> <span id="lat-txt">—</span></div>
+            <div class="bar-wrap"><div class="bar-fill" id="lat-bar" style="width:0%"></div></div>
+          </div>
+          <div class="streak-row">
+            <div class="streak-label" data-i18n="stats.streak">streak</div>
+            <div class="sdots" id="sdots"></div>
+          </div>
         </div>
       </div>
-    </div>
 
-    <div class="dice-area">
-      <div class="dice" id="dice"><div class="dice-time">?</div><div class="dice-period">roll!</div></div>
-      <button id="roll-btn" data-i18n="buttons.roll">🎲 Roll!</button>
-      <div class="target-display" id="target-display">—</div>
-    </div>
-
-    <div class="action-row">
-      <button id="hint-btn" style="display:none" data-i18n="buttons.hint">💡 Hint</button>
-      <button id="check-btn" data-i18n="buttons.check">✓ Check!</button>
-      <button id="next-btn" data-i18n="buttons.next">Next →</button>
-    </div>
-    <div id="fb"></div>
-
-    <div class="clock-wrap">
-      <svg id="clock" viewBox="0 0 400 400"></svg>
-    </div>
-
-    <div class="sliders">
-      <div class="rail" id="hour-rail">
-        <span class="rail-label" data-i18n="rails.hour">HOUR</span>
-        <div class="rail-ticks" id="hour-ticks"></div>
-        <div class="knob hour-knob" id="hour-knob">12</div>
+      <div class="dice-area">
+        <div class="dice" id="dice"><div class="dice-time">?</div><div class="dice-period">roll!</div></div>
+        <button id="roll-btn" data-i18n="buttons.roll">🎲 Roll!</button>
+        <div class="target-display" id="target-display">—</div>
       </div>
-      <div class="rail" id="minute-rail">
-        <span class="rail-label" data-i18n="rails.minute">MINUTE</span>
-        <div class="rail-ticks" id="minute-ticks"></div>
-        <div class="knob minute-knob" id="minute-knob">0</div>
+
+      <div class="action-row">
+        <button id="hint-btn" style="display:none" data-i18n="buttons.hint">💡 Hint</button>
+        <button id="check-btn" data-i18n="buttons.check">✓ Check!</button>
+        <button id="next-btn" data-i18n="buttons.next">Next →</button>
+      </div>
+      <div id="fb"></div>
+    </div>
+
+    <div class="play-right">
+      <div class="clock-wrap">
+        <svg id="clock" viewBox="0 0 400 400"></svg>
+      </div>
+
+      <div class="sliders">
+        <div class="rail" id="hour-rail">
+          <span class="rail-label" data-i18n="rails.hour">HOUR</span>
+          <div class="rail-ticks" id="hour-ticks"></div>
+          <div class="knob hour-knob" id="hour-knob">12</div>
+        </div>
+        <div class="rail" id="minute-rail">
+          <span class="rail-label" data-i18n="rails.minute">MINUTE</span>
+          <div class="rail-ticks" id="minute-ticks"></div>
+          <div class="knob minute-knob" id="minute-knob">0</div>
+        </div>
       </div>
     </div>
   </div>
