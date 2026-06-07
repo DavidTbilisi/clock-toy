@@ -10,6 +10,7 @@ const ERROR_KEY = {
   'minute hand':   'minuteHand',
   'hour slider':   'hourSlider',
   'minute slider': 'minuteSlider',
+  'period':        'amPm',
   'ran out of time': 'ranOutOfTime',
 };
 

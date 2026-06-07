@@ -27,6 +27,10 @@ async function setAll(page, h, m) {
     const s = window.__clock.STATE();
     s.handH = h; s.handM = m;
     s.sliderH = h; s.sliderM = m;
+    // Free Play / drill1 compare the period (AM/PM) too, so align it with
+    // whatever the round target needs.
+    const r = window.__clock.ROUND();
+    if (r) window.__clock.setPeriod(r.period);
     renderHands();
     renderSlider('hour');
     renderSlider('minute');
@@ -72,6 +76,24 @@ test.describe('Free Play', () => {
     await page.click('#check-btn');
     await expect(page.locator('#fb.bad')).toBeVisible();
     await expect(page.locator('#fb .fv')).toContainText('hour hand');
+  });
+
+  test('matching hand/slider values but wrong period flags an AM/PM miss', async ({ page }) => {
+    // Free Play default: handH=12, period=PM (noon). Force an AM target so the
+    // player's leftover PM period is the ONLY mismatch — set state directly so
+    // we don't go through the setAll helper, which auto-aligns period.
+    await setupMode(page, 'free', 'easy');
+    await page.evaluate(() => {
+      const r = window.__clock.ROUND();
+      r.hour = 1; r.minute = 0; r.hour24 = 1; r.period = 'am';
+      const s = window.__clock.STATE();
+      s.handH = 1; s.handM = 0; s.sliderH = 1; s.sliderM = 0;
+      renderHands(); renderSlider('hour'); renderSlider('minute');
+      // Do NOT call setPeriod — that's the point of this test.
+    });
+    await page.click('#check-btn');
+    await expect(page.locator('#fb.bad')).toBeVisible();
+    await expect(page.locator('#fb .fv')).toContainText('AM or PM');
   });
 
   test('clicking on the clock face snaps the nearest unlocked hand', async ({ page }) => {

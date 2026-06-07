@@ -56,6 +56,7 @@ export default {
     minuteHand:  'minute hand',
     hourSlider:  'hour slider',
     minuteSlider: 'minute slider',
+    amPm:        'AM or PM',
     ranOutOfTime: 'ran out of time',
   },
 

@@ -196,6 +196,7 @@ window.__clock = {
   MODE:  () => store.MODE,
   DIFF:  () => store.DIFF,
   period: () => store.period,
+  setPeriod: (p) => store.setPeriod(p),
   freePlayHour24: () => store.freePlayHour24(),
   applySky: (h, m) => sky.apply(h, m),
   // Drive the store through its real setters so observers fire (used by tests).

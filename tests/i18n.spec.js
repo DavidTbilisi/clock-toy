@@ -51,13 +51,14 @@ test.describe('i18n', () => {
 
     // Set the right answer and check in EN; verify English feedback.
     const round = await page.evaluate(() => window.__clock.ROUND());
-    await page.evaluate(({ h, m }) => {
+    await page.evaluate(({ h, m, p }) => {
       const s = window.__clock.STATE();
       s.handH = h; s.handM = m;
       s.sliderH = h; s.sliderM = m;
+      window.__clock.setPeriod(p);
       renderHands();
       renderSlider('hour'); renderSlider('minute');
-    }, { h: round.hour, m: round.minute });
+    }, { h: round.hour, m: round.minute, p: round.period });
     await page.click('#check-btn');
     await expect(page.locator('#fb .fv')).toContainText('exactly right');
 

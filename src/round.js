@@ -12,6 +12,7 @@ const ERROR_AUDIO_KEY = {
   'minute hand':   'wrong-minute-hand',
   'hour slider':   'wrong-hour-slider',
   'minute slider': 'wrong-minute-slider',
+  'period':        'wrong-am-pm',
 };
 
 export class RoundRunner {
@@ -94,6 +95,13 @@ export class RoundRunner {
     if (!STATE.locked.handM   && STATE.handM   !== ROUND.minute) errors.push('minute hand');
     if (!STATE.locked.sliderH && STATE.sliderH !== ROUND.hour)   errors.push('hour slider');
     if (!STATE.locked.sliderM && STATE.sliderM !== ROUND.minute) errors.push('minute slider');
+    // The 12-hour clock face can't show AM/PM on its own, so we only enforce
+    // period when the player can actually drive it — i.e., when the hour hand
+    // is unlocked and they can cross the 11↔12 boundary. drill2 locks the
+    // hands, so we don't hold the player to the period there.
+    if (!STATE.locked.handH && this.store.period !== ROUND.period) {
+      errors.push('period');
+    }
     const ok = errors.length === 0;
 
     if (mode.timed) {

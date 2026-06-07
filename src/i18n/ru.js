@@ -55,6 +55,7 @@ export default {
     minuteHand:   'минутная стрелка',
     hourSlider:   'часовой слайдер',
     minuteSlider: 'минутный слайдер',
+    amPm:         'утро или вечер',
     ranOutOfTime: 'время вышло',
   },
 

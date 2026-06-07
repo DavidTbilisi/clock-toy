@@ -55,6 +55,7 @@ export default {
     minuteHand:   'წუთის ისარი',
     hourSlider:   'საათის სლაიდერი',
     minuteSlider: 'წუთის სლაიდერი',
+    amPm:         'დღე თუ ღამე',
     ranOutOfTime: 'დრო ამოგვეწურა',
   },
 
