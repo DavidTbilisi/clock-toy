@@ -536,10 +536,16 @@ body{
   /* :not([hidden]) so an explicit display rule doesn't defeat the hidden attribute. */
   #play:not([hidden]){
     display:grid;
-    grid-template-columns:minmax(260px,1fr) var(--clock-width);
+    grid-template-columns:minmax(260px,360px) var(--clock-width);
     column-gap:26px;
     align-items:center;
     justify-content:center;
+  }
+  /* Free Play: stats.js sets inline display:none on stats-row/prog/timer.
+     When that's true, the left column has nothing to show — collapse the
+     grid so the right column (clock + controls) sits horizontally centred. */
+  #play:not([hidden]):has(#stats-row[style*="display: none"]){
+    grid-template-columns:var(--clock-width);
   }
   .play-left,.play-right{
     display:flex;flex-direction:column;
