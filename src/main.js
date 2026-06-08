@@ -89,38 +89,45 @@ const pickers = new Pickers({
 });
 
 // ── Observer wiring (Store events → side effects) ───────────
-// In Free Play, dragging hands also drags the time of day. The 12-hour clock
-// face is ambiguous (one "12" stands for both noon and midnight), so the
-// AM/PM toggle below disambiguates explicitly into a 24-hour time.
+// Dragging hands also drags the time of day — in every mode, so the player
+// has a visible cue for their own AM/PM choice (the sky never gives away the
+// round's target). The 12-hour face is ambiguous (one "12" stands for both
+// noon and midnight); the AM/PM toggle below disambiguates explicitly.
 function applySkyFromHands() {
   sky.apply(store.freePlayHour24(), store.STATE.handM);
 }
 store.on('hands:change', () => {
   clock.renderHands();
-  if (store.MODE === 'free') applySkyFromHands();
+  applySkyFromHands();
 });
 store.on('sliders:change', (h, m) => {
   sliders.render('hour');
   sliders.render('minute');
 });
 
-// Cycle detector: in Free Play, two full revolutions of the hour hand = one
-// full 24-hour day. The period auto-flips AM ↔ PM whenever the hand crosses
-// the 11↔12 boundary on the clock face. No visible toggle; the only way to
-// see the change is through the sky responding.
-let prevFreeHandH = null;
+// Cycle detector: two full revolutions of the hour hand = one full 24-hour
+// day. The period auto-flips AM ↔ PM whenever the hand crosses the 11↔12
+// boundary on the clock face. Active in every mode where the hour hand can
+// move (drill2 locks it, so the listener simply never fires there). The
+// `round:new` handler re-syncs prevHandH to whatever the round's reset /
+// setup left it at, otherwise the first post-round drag would compare
+// against a stale pre-round value.
+let prevHandH = null;
 store.on('mode:change', (m) => {
-  prevFreeHandH = m === 'free' ? store.STATE.handH : null;
+  prevHandH = m ? store.STATE.handH : null;
+});
+store.on('round:new', () => {
+  if (store.MODE) prevHandH = store.STATE.handH;
 });
 store.on('hands:change', (h) => {
-  if (prevFreeHandH === null) return;
-  if ((prevFreeHandH === 11 && h === 12) || (prevFreeHandH === 12 && h === 11)) {
+  if (prevHandH === null) return;
+  if ((prevHandH === 11 && h === 12) || (prevHandH === 12 && h === 11)) {
     store.setPeriod(store.period === 'am' ? 'pm' : 'am');
   }
-  prevFreeHandH = h;
+  prevHandH = h;
 });
 store.on('period:change', () => {
-  if (store.MODE === 'free') applySkyFromHands();
+  applySkyFromHands();
 });
 
 // ── DOM event binding (replaces former inline onclick=…) ────
@@ -166,11 +173,7 @@ window.addEventListener('resize', () => {
   sliders.render('hour');
   sliders.render('minute');
   if (store.ROUND) {
-    if (store.MODE === 'free') {
-      applySkyFromHands();
-    } else {
-      sky.apply(store.ROUND.hour24, store.ROUND.minute);
-    }
+    applySkyFromHands();
   } else {
     sky.apply(12, 0);
   }

@@ -12,6 +12,10 @@ export const Drill2Mode = {
     store.STATE.handM = round.minute;
     store.STATE.locked.handH = true;
     store.STATE.locked.handM = true;
+    // Hands are locked so the cycle detector can't reach the period from the
+    // player side. Align period with the round so the sky truthfully matches
+    // the locked hand time (drill2 doesn't grade period either way).
+    store.setPeriod(round.period);
   },
 
   targetText() {

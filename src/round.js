@@ -177,11 +177,9 @@ export class RoundRunner {
   _mode() { return MODES[this.store.MODE]; }
 
   _applySkyForRound() {
-    if (this.store.MODE === 'free') {
-      this.sky.apply(this.store.freePlayHour24(), this.store.STATE.handM);
-    } else {
-      this.sky.apply(this.store.ROUND.hour24, this.store.ROUND.minute);
-    }
+    // Sky always reflects the player's current answer (hands + period), never
+    // the round's target. Otherwise the sky would give away AM vs PM in drills.
+    this.sky.apply(this.store.freePlayHour24(), this.store.STATE.handM);
   }
 
   _startTimer() {
